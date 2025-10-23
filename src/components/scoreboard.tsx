@@ -16,6 +16,7 @@ interface ScoreboardProps {
   currentGameIndex: number;
   player1Color: string;
   player2Color: string;
+  scores: [number, number][];
 }
 
 const getContrastingTextColor = (hexcolor: string) => {
@@ -42,6 +43,7 @@ export function Scoreboard({
   currentGameIndex,
   player1Color,
   player2Color,
+  scores,
 }: ScoreboardProps) {
 
   const swapSides = currentGameIndex % 2 === 1;
@@ -53,6 +55,7 @@ export function Scoreboard({
     server: swapSides ? 1 : 0,
     onPoint: swapSides ? onPlayer2Point : onPlayer1Point,
     color: swapSides ? player2Color : player1Color,
+    isPlayer1: !swapSides,
   };
 
   const playerRight = {
@@ -62,7 +65,10 @@ export function Scoreboard({
     server: swapSides ? 0 : 1,
     onPoint: swapSides ? onPlayer1Point : onPlayer2Point,
     color: swapSides ? player1Color : player2Color,
+    isPlayer1: swapSides,
   };
+
+  const finishedGamesScores = scores.slice(0, currentGameIndex);
 
   return (
     <div className="grid grid-cols-2 w-full h-[60vh] max-h-[800px] text-6xl md:text-8xl lg:text-9xl font-bold border-4 border-primary rounded-lg overflow-hidden">
@@ -81,6 +87,17 @@ export function Scoreboard({
         <div className="absolute top-12 text-xl font-semibold">
           Game: {playerLeft.gamesWon}
         </div>
+
+        <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
+            {finishedGamesScores.map((score, index) => (
+                <div key={`left-game-${index}`} className="text-xs font-bold border rounded-md px-1.5 py-0.5" style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                }}>
+                  {playerLeft.isPlayer1 ? score[0] : score[1]}
+                </div>
+            ))}
+        </div>
+
         <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
           {playerLeft.score}
         </div>
@@ -104,6 +121,17 @@ export function Scoreboard({
          <div className="absolute top-12 text-xl font-semibold">
           Game: {playerRight.gamesWon}
         </div>
+
+        <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
+            {finishedGamesScores.map((score, index) => (
+                <div key={`right-game-${index}`} className="text-xs font-bold border rounded-md px-1.5 py-0.5" style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.2)'
+                }}>
+                  {playerRight.isPlayer1 ? score[0] : score[1]}
+                </div>
+            ))}
+        </div>
+
         <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
           {playerRight.score}
         </div>

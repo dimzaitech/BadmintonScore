@@ -115,6 +115,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             currentGameIndex={state.currentGameIndex}
             player1Color={state.config.player1Color}
             player2Color={state.config.player2Color}
+            scores={state.scores}
         />
 
       {state.winner !== null && (

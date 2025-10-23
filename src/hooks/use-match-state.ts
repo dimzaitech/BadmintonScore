@@ -13,6 +13,7 @@ const createInitialState = (config: MatchConfig): GameState => ({
   gamesWon: [0, 0],
   server: config.firstServer,
   winner: null,
+  sidesSwapped: false,
   stats: [
     { faults: 0, serviceWinners: 0 },
     { faults: 0, serviceWinners: 0 },
@@ -78,6 +79,12 @@ export function useMatchState(config: MatchConfig) {
     updateState(newState);
   }, [currentState, updateState]);
   
+  const swapSides = useCallback(() => {
+    const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
+    newState.sidesSwapped = !newState.sidesSwapped;
+    updateState(newState);
+  }, [currentState, updateState]);
+
   const saveMatch = useCallback((summary?: string) => {
     if(currentState.winner === null) return; // Only save completed matches
 
@@ -108,6 +115,7 @@ export function useMatchState(config: MatchConfig) {
     canUndo,
     canRedo,
     saveMatch,
+    swapSides,
   };
 }
 

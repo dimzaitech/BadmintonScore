@@ -20,6 +20,7 @@ export type GameState = {
   gamesWon: [number, number];
   server: 0 | 1;
   winner: 0 | 1 | null;
+  sidesSwapped: boolean;
   stats: [PlayerStats, PlayerStats];
 };
 

@@ -61,7 +61,7 @@ function TimerDisplay() {
 
 
 export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfaceProps) {
-  const { state, awardPoint, undo, redo, canUndo, canRedo, saveMatch } = useMatchState(matchConfig);
+  const { state, awardPoint, undo, redo, canUndo, canRedo, saveMatch, swapSides } = useMatchState(matchConfig);
   const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(false);
   
@@ -116,6 +116,8 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             player1Color={state.config.player1Color}
             player2Color={state.config.player2Color}
             scores={state.scores}
+            sidesSwapped={state.sidesSwapped}
+            onSwapSides={swapSides}
         />
 
       {state.winner !== null && (

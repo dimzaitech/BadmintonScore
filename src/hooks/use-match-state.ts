@@ -18,6 +18,8 @@ const createInitialState = (config: MatchConfig): GameState => ({
     { faults: 0, serviceWinners: 0 },
     { faults: 0, serviceWinners: 0 },
   ],
+  team1Position: 0,
+  team2Position: 0,
 });
 
 export function useMatchState(config: MatchConfig) {
@@ -53,11 +55,23 @@ export function useMatchState(config: MatchConfig) {
 
     const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
 
+    const previousServer = newState.server;
+    
     // Update score
     newState.scores[newState.currentGameIndex][playerIndex]++;
     
     // Update server
     newState.server = playerIndex;
+
+    // In doubles, if serving team wins a point, the players switch sides.
+    if (newState.config.matchType === 'ganda' && playerIndex === previousServer) {
+        if (playerIndex === 0) {
+            newState.team1Position = newState.team1Position === 0 ? 1 : 0;
+        } else {
+            newState.team2Position = newState.team2Position === 0 ? 1 : 0;
+        }
+    }
+
 
     // Check for game/match win
     const [p1Score, p2Score] = newState.scores[newState.currentGameIndex];
@@ -73,6 +87,9 @@ export function useMatchState(config: MatchConfig) {
         newState.currentGameIndex++;
         // Winner of the previous game serves first in the next game
         newState.server = gameWinner;
+        // Reset player positions for the new game
+        newState.team1Position = 0;
+        newState.team2Position = 0;
       }
     }
     
@@ -128,15 +145,9 @@ function checkGameWinner(p1Score: number, p2Score: number, winningScore: number)
   if (p1Score === capScore) return 0;
   if (p2Score === capScore) return 1;
 
-  // Check for win before deuce
-  if (p1Score >= winningScore && p1Score > p2Score + 1) return 0;
-  if (p2Score >= winningScore && p2Score > p1Score + 1) return 1;
-
-  // Check for win at or after deuce
-  if (p1Score >= deuceScore && p2Score >= deuceScore) {
-    if (p1Score > p2Score + 1) return 0;
-    if (p2Score > p1Score + 1) return 1;
-  }
+  // Standard win condition
+  if (p1Score >= winningScore && p1Score >= p2Score + 2) return 0;
+  if (p2Score >= winningScore && p2Score >= p1Score + 2) return 1;
   
   return null;
 }

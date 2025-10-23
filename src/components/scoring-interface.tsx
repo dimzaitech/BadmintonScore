@@ -103,20 +103,9 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
         </div>
         
         <Scoreboard 
-            player1Name={state.config.player1Name}
-            player2Name={state.config.player2Name}
-            player1Score={state.scores[state.currentGameIndex][0]}
-            player2Score={state.scores[state.currentGameIndex][1]}
-            player1GamesWon={state.gamesWon[0]}
-            player2GamesWon={state.gamesWon[1]}
-            server={state.winner === null ? state.server : null}
+            state={state}
             onPlayer1Point={() => handleAwardPoint(0)}
             onPlayer2Point={(): void => handleAwardPoint(1)}
-            currentGameIndex={state.currentGameIndex}
-            player1Color={state.config.player1Color}
-            player2Color={state.config.player2Color}
-            scores={state.scores}
-            sidesSwapped={state.sidesSwapped}
             onSwapSides={swapSides}
         />
 

@@ -1,6 +1,14 @@
 export type MatchConfig = {
-  player1Name: string;
-  player2Name: string;
+  player1Name: string; // For singles, or team name for doubles
+  player2Name: string; // For singles, or team name for doubles
+  
+  // Doubles-specific player names
+  team1_player1?: string;
+  team1_player2?: string;
+  team2_player1?: string;
+  team2_player2?: string;
+  matchType: "tunggal" | "ganda";
+
   numberOfGames: number;
   firstServer: 0 | 1;
   player1Color: string;
@@ -22,6 +30,9 @@ export type GameState = {
   winner: 0 | 1 | null;
   sidesSwapped: boolean;
   stats: [PlayerStats, PlayerStats];
+  // Tracks the player position for doubles. 0 = initial, 1 = swapped
+  team1Position: 0 | 1; 
+  team2Position: 0 | 1;
 };
 
 export type MatchData = GameState & {

@@ -5,23 +5,13 @@ import { ShuttlecockIcon } from "@/components/shuttlecock-icon";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { ArrowLeftRight } from "lucide-react";
+import type { GameState } from "@/lib/types";
 
 
 interface ScoreboardProps {
-  player1Name: string;
-  player2Name:string;
-  player1Score: number;
-  player2Score: number;
-  player1GamesWon: number;
-  player2GamesWon: number;
-  server: 0 | 1 | null;
+  state: GameState;
   onPlayer1Point: () => void;
   onPlayer2Point: () => void;
-  currentGameIndex: number;
-  player1Color: string;
-  player2Color: string;
-  scores: [number, number][];
-  sidesSwapped: boolean;
   onSwapSides: () => void;
 }
 
@@ -37,40 +27,80 @@ const getContrastingTextColor = (hexcolor: string) => {
 };
 
 export function Scoreboard({
-  player1Name,
-  player2Name,
-  player1Score,
-  player2Score,
-  player1GamesWon,
-  player2GamesWon,
-  server,
+  state,
   onPlayer1Point,
   onPlayer2Point,
-  currentGameIndex,
-  player1Color,
-  player2Color,
-  scores,
-  sidesSwapped,
   onSwapSides,
 }: ScoreboardProps) {
 
+  const { config, scores, currentGameIndex, gamesWon, server, sidesSwapped, team1Position, team2Position } = state;
+
+  const getDoublesPlayerNames = (teamIndex: 0 | 1, currentScore: number, teamPosition: 0 | 1) => {
+    if (config.matchType !== 'ganda' || !config.team1_player1 || !config.team1_player2 || !config.team2_player1 || !config.team2_player2) {
+      return teamIndex === 0 ? config.player1Name : config.player2Name;
+    }
+
+    const team1P1 = config.team1_player1;
+    const team1P2 = config.team1_player2;
+    const team2P1 = config.team2_player1;
+    const team2P2 = config.team2_player2;
+
+    let p1, p2;
+
+    if (teamIndex === 0) {
+      p1 = team1P1;
+      p2 = team1P2;
+    } else {
+      p1 = team2P1;
+      p2 = team2P2;
+    }
+
+    // At the start of the game, the player who serves is determined by firstServer.
+    // Let's assume the serving player starts on the right (even score).
+    const isServingTeam = server === teamIndex;
+    const isScoreEven = currentScore % 2 === 0;
+
+    // 'teamPosition' tracks the server-receiver swap. 0 = initial, 1 = swapped.
+    // The player on the right for an even score is the initial server.
+    // The player on the left for an odd score is the initial server's partner.
+    if (isServingTeam) {
+      if (isScoreEven) {
+        // server is on the right
+        return teamPosition === 0 ? `${p2} / ${p1}` : `${p1} / ${p2}`;
+      } else {
+        // server is on the left
+        return teamPosition === 0 ? `${p1} / ${p2}` : `${p2} / ${p1}`;
+      }
+    } else {
+      // Non-serving team positions are based on their score at last service win.
+      // This simplified logic just shows the fixed pair.
+      return teamPosition === 0 ? `${p1} / ${p2}` : `${p2} / ${p1}`;
+    }
+  };
+
+  const p1Score = scores[currentGameIndex][0];
+  const p2Score = scores[currentGameIndex][1];
+
+  const player1Name = getDoublesPlayerNames(0, p1Score, team1Position);
+  const player2Name = getDoublesPlayerNames(1, p2Score, team2Position);
+
   const playerLeft = {
     name: sidesSwapped ? player2Name : player1Name,
-    score: sidesSwapped ? player2Score : player1Score,
-    gamesWon: sidesSwapped ? player2GamesWon : player1GamesWon,
+    score: sidesSwapped ? p2Score : p1Score,
+    gamesWon: sidesSwapped ? gamesWon[1] : gamesWon[0],
     serverIndex: sidesSwapped ? 1 : 0,
     onPoint: sidesSwapped ? onPlayer2Point : onPlayer1Point,
-    color: sidesSwapped ? player2Color : player1Color,
+    color: sidesSwapped ? config.player2Color : config.player1Color,
     isPlayer1: !sidesSwapped,
   };
 
   const playerRight = {
     name: sidesSwapped ? player1Name : player2Name,
-    score: sidesSwapped ? player1Score : player2Score,
-    gamesWon: sidesSwapped ? player1GamesWon : player2GamesWon,
+    score: sidesSwapped ? p1Score : p2Score,
+    gamesWon: sidesSwapped ? gamesWon[0] : gamesWon[1],
     serverIndex: sidesSwapped ? 0 : 1,
     onPoint: sidesSwapped ? onPlayer1Point : onPlayer2Point,
-    color: sidesSwapped ? player1Color : player2Color,
+    color: sidesSwapped ? config.player1Color : config.player2Color,
     isPlayer1: sidesSwapped,
   };
 
@@ -119,7 +149,7 @@ export function Scoreboard({
           <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
             {playerLeft.score}
           </div>
-          {server === playerLeft.serverIndex && (
+          {server === playerLeft.serverIndex && state.winner === null && (
              <ShuttlecockIcon className={cn(
                 "absolute bottom-4 h-10 w-10 animate-pulse",
                 getShuttlecockPositionClass(playerLeft.score)
@@ -159,7 +189,7 @@ export function Scoreboard({
           <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
             {playerRight.score}
           </div>
-          {server === playerRight.serverIndex && (
+          {server === playerRight.serverIndex && state.winner === null && (
             <ShuttlecockIcon className={cn(
               "absolute bottom-4 h-10 w-10 animate-pulse",
               getShuttlecockPositionClass(playerRight.score)

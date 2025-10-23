@@ -51,7 +51,7 @@ const formSchema = z.object({
     return true;
 }, {
     message: "Nama rekan setim harus diisi untuk mode ganda.",
-    path: ["player1bName"], // you can decide where to show the error
+    path: ["player1bName"],
 });
 
 type MatchSetupFormValues = z.infer<typeof formSchema>;
@@ -79,27 +79,36 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
   const matchType = form.watch("matchType");
 
   function onSubmit(values: MatchSetupFormValues) {
-    let team1Name = values.player1Name;
-    let team2Name = values.player2Name;
-
-    if (values.matchType === 'ganda' && values.player1bName && values.player2bName) {
-        team1Name = `${values.player1Name} / ${values.player1bName}`;
-        team2Name = `${values.player2Name} / ${values.player2bName}`;
-    }
-
-    onMatchStart({
-      player1Name: team1Name,
-      player2Name: team2Name,
+    const config: MatchConfig = {
+      player1Name: values.player1Name,
+      player2Name: values.player2Name,
+      matchType: values.matchType,
       numberOfGames: 3, // Best of 3 games
       firstServer: parseInt(values.firstServer, 10) as 0 | 1,
       player1Color: values.player1Color,
       player2Color: values.player2Color,
       winningScore: parseInt(values.winningScore, 10) as 10 | 15 | 21,
-    });
+    };
+
+    if (values.matchType === 'ganda' && values.player1bName && values.player2bName) {
+        config.player1Name = `${values.player1Name} / ${values.player1bName}`;
+        config.player2Name = `${values.player2Name} / ${values.player2bName}`;
+        config.team1_player1 = values.player1Name;
+        config.team1_player2 = values.player1bName;
+        config.team2_player1 = values.player2Name;
+        config.team2_player2 = values.player2bName;
+    }
+
+    onMatchStart(config);
   }
 
-  const team1DisplayName = matchType === 'ganda' ? `${form.watch("player1Name")} / ${form.watch("player1bName") || '...'}` : form.watch("player1Name");
-  const team2DisplayName = matchType === 'ganda' ? `${form.watch("player2Name")} / ${form.watch("player2bName") || '...'}` : form.watch("player2Name");
+  const team1DisplayName = matchType === 'ganda' 
+    ? `${form.watch("player1Name") || 'Pemain 1A'} / ${form.watch("player1bName") || 'Pemain 1B'}` 
+    : form.watch("player1Name");
+
+  const team2DisplayName = matchType === 'ganda' 
+    ? `${form.watch("player2Name") || 'Pemain 2A'} / ${form.watch("player2bName") || 'Pemain 2B'}` 
+    : form.watch("player2Name");
 
 
   return (
@@ -121,7 +130,18 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                   <FormLabel>Tipe Pertandingan</FormLabel>
                   <FormControl>
                     <RadioGroup
-                      onValueChange={field.onChange}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        if (value === 'ganda') {
+                            form.setValue('player1Name', 'Pemain 1A');
+                            form.setValue('player1bName', 'Pemain 1B');
+                            form.setValue('player2Name', 'Pemain 2A');
+                            form.setValue('player2bName', 'Pemain 2B');
+                        } else {
+                            form.setValue('player1Name', 'Pemain 1');
+                            form.setValue('player2Name', 'Pemain 2');
+                        }
+                      }}
                       defaultValue={field.value}
                       className="flex space-x-4"
                     >
@@ -270,7 +290,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih skor" />
-                        </SelectTrigger>
+                        </Trigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="10">10 Poin</SelectItem>
@@ -295,5 +315,3 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     </Card>
   );
 }
-
-    

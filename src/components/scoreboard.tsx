@@ -95,30 +95,20 @@ export function Scoreboard({
   }
 
   return (
-    <div
-      className="grid h-[60vh] max-h-[800px] w-full grid-cols-[1fr_6fr_6fr_1fr] grid-rows-[auto_1fr_1fr] gap-0.5 bg-background font-bold"
-      style={{
-        gridTemplateAreas: `
-          'name-left name-left name-right name-right'
-          'prev1-left score-left score-right prev1-right'
-          'prev2-left score-left score-right prev2-right'
-        `,
-      }}
-    >
+    <div className="grid h-[60vh] max-h-[800px] w-full grid-cols-[1fr_6fr_6fr_1fr] grid-rows-[auto_1fr_1fr_1fr] gap-0.5 bg-background font-bold">
       {/* Names */}
-      <CourtCell className="border-b-0" style={{ gridArea: "name-left" }}>{playerLeft.name}</CourtCell>
-      <CourtCell className="border-b-0" style={{ gridArea: "name-right" }}>{playerRight.name}</CourtCell>
+      <CourtCell className="border-b-0 row-start-1 col-start-2">{playerLeft.name}</CourtCell>
+      <CourtCell className="border-b-0 row-start-1 col-start-3">{playerRight.name}</CourtCell>
       
       {/* Previous Scores */}
-      <CourtCell style={{ gridArea: "prev1-left" }}>{getPreviousScore('left', 0)}</CourtCell>
-      <CourtCell style={{ gridArea: "prev2-left" }}>{getPreviousScore('left', 1)}</CourtCell>
-      <CourtCell style={{ gridArea: "prev1-right" }}>{getPreviousScore('right', 0)}</CourtCell>
-      <CourtCell style={{ gridArea: "prev2-right" }}>{getPreviousScore('right', 1)}</CourtCell>
+      <CourtCell className="row-start-2 col-start-1">{getPreviousScore('left', 0)}</CourtCell>
+      <CourtCell className="row-start-3 col-start-1">{getPreviousScore('left', 1)}</CourtCell>
+      <CourtCell className="row-start-2 col-start-4">{getPreviousScore('right', 0)}</CourtCell>
+      <CourtCell className="row-start-3 col-start-4">{getPreviousScore('right', 1)}</CourtCell>
 
       {/* Main Scores */}
       <CourtCell
-        className="relative cursor-pointer text-[18vh] leading-none"
-        style={{ gridArea: "score-left" }}
+        className="relative cursor-pointer text-[18vh] leading-none row-start-2 col-start-2 row-span-2"
         onClick={playerLeft.onPoint}
       >
         {playerLeft.score}
@@ -127,8 +117,7 @@ export function Scoreboard({
         )}
       </CourtCell>
       <CourtCell
-        className="relative cursor-pointer text-[18vh] leading-none"
-        style={{ gridArea: "score-right" }}
+        className="relative cursor-pointer text-[18vh] leading-none row-start-2 col-start-3 row-span-2"
         onClick={playerRight.onPoint}
       >
         {playerRight.score}
@@ -137,19 +126,16 @@ export function Scoreboard({
         )}
       </CourtCell>
 
-      {/* Center Console */}
-      <div className="absolute left-1/2 top-1/2 z-10 grid h-full w-1/4 -translate-x-1/2 -translate-y-1/2 grid-cols-2 grid-rows-[2fr_3fr_2fr_2fr] text-lg">
-          <CourtCell className="col-span-2 text-4xl">{playerLeft.gamesWon}</CourtCell>
-          <CourtCell className="col-span-2 !border-0"></CourtCell>
-          <CourtCell className="col-span-2 !border-0"></CourtCell>
-          <CourtCell className="col-span-2 !border-0"></CourtCell>
-          <CourtCell className="col-span-2 text-4xl">{playerRight.gamesWon}</CourtCell>
+      {/* Games Won - Center Top */}
+      <div className="col-start-2 col-span-2 row-start-1 grid grid-cols-2">
+        <div className="col-start-1 flex justify-end items-center pr-2">{playerLeft.gamesWon}</div>
+        <div className="col-start-2 flex justify-start items-center pl-2">{playerRight.gamesWon}</div>
       </div>
-       <div className="absolute left-1/2 top-1/2 z-0 grid h-full w-1/4 -translate-x-1/2 -translate-y-1/2 grid-cols-2 grid-rows-[1fr_1fr] text-lg">
-           <CourtCell className="col-span-1">{playerLeft.gamesWon}</CourtCell>
-           <CourtCell className="col-span-1">{playerRight.gamesWon}</CourtCell>
-           <CourtCell className="col-span-2"></CourtCell>
-       </div>
+
+       {/* Bottom score boxes, for aesthetic */}
+      <CourtCell className="row-start-4 col-start-2"></CourtCell>
+      <CourtCell className="row-start-4 col-start-3"></CourtCell>
+
     </div>
   );
 }

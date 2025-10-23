@@ -79,6 +79,10 @@ export function Scoreboard({
   const getShuttlecockPositionClass = (score: number) => {
     return score % 2 === 0 ? "right-4" : "left-4";
   };
+  
+  const getNamePositionClass = (score: number) => {
+    return score % 2 === 0 ? "right-4" : "left-4";
+  };
 
   return (
     <div className="relative w-full h-[60vh] max-h-[800px] border-4 border-primary rounded-lg overflow-hidden">
@@ -92,7 +96,10 @@ export function Scoreboard({
           }}
           onClick={playerLeft.onPoint}
         >
-          <div className="absolute top-4 text-2xl font-bold tracking-tight">
+          <div className={cn(
+              "absolute top-4 text-2xl font-bold tracking-tight",
+              server === playerLeft.serverIndex ? getNamePositionClass(playerLeft.score) : "inset-x-0 text-center"
+            )}>
             {playerLeft.name}
           </div>
           <div className="absolute top-12 text-xl font-semibold">
@@ -129,7 +136,10 @@ export function Scoreboard({
           }}
           onClick={playerRight.onPoint}
         >
-          <div className="absolute top-4 text-2xl font-bold tracking-tight">
+          <div className={cn(
+              "absolute top-4 text-2xl font-bold tracking-tight",
+              server === playerRight.serverIndex ? getNamePositionClass(playerRight.score) : "inset-x-0 text-center"
+            )}>
             {playerRight.name}
           </div>
            <div className="absolute top-12 text-xl font-semibold">

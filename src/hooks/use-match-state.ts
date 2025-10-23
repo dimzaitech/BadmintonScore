@@ -113,8 +113,23 @@ export function useMatchState(config: MatchConfig) {
 
 
 function checkGameWinner(p1Score: number, p2Score: number, winningScore: number): 0 | 1 | null {
-  if (p1Score >= winningScore) return 0;
-  if (p2Score >= winningScore) return 1;
+  const deuceScore = winningScore - 1;
+  const capScore = winningScore === 21 ? 30 : (winningScore === 15 ? 20 : 15);
+
+  // Check for cap score win
+  if (p1Score === capScore) return 0;
+  if (p2Score === capScore) return 1;
+
+  // Check for win before deuce
+  if (p1Score >= winningScore && p1Score > p2Score + 1) return 0;
+  if (p2Score >= winningScore && p2Score > p1Score + 1) return 1;
+
+  // Check for win at or after deuce
+  if (p1Score >= deuceScore && p2Score >= deuceScore) {
+    if (p1Score > p2Score + 1) return 0;
+    if (p2Score > p1Score + 1) return 1;
+  }
+  
   return null;
 }
 

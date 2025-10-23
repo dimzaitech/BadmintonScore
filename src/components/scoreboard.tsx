@@ -1,3 +1,4 @@
+
 "use client";
 
 import { ShuttlecockIcon } from "@/components/shuttlecock-icon";
@@ -96,7 +97,7 @@ export function Scoreboard({
 
           <div className="absolute left-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
               {finishedGamesScores.map((score, index) => (
-                  <div key={`left-game-${index}`} className="text-xs font-bold border rounded-md px-1.5 py-0.5" style={{
+                  <div key={`left-game-${index}`} className="text-lg font-bold border rounded-md px-1.5 py-0.5" style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.2)'
                   }}>
                     {playerLeft.isPlayer1 ? score[0] : score[1]}
@@ -130,7 +131,7 @@ export function Scoreboard({
 
           <div className="absolute right-2 top-1/2 -translate-y-1/2 flex flex-col gap-1">
               {finishedGamesScores.map((score, index) => (
-                  <div key={`right-game-${index}`} className="text-xs font-bold border rounded-md px-1.5 py-0.5" style={{
+                  <div key={`right-game-${index}`} className="text-lg font-bold border rounded-md px-1.5 py-0.5" style={{
                     backgroundColor: 'rgba(255, 255, 255, 0.2)'
                   }}>
                     {playerRight.isPlayer1 ? score[0] : score[1]}

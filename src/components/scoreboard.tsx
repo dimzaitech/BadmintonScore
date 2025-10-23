@@ -1,9 +1,11 @@
-import { Server } from "lucide-react";
+"use client";
+
+import { ShuttlecockIcon } from "@/components/shuttlecock-icon";
 import { cn } from "@/lib/utils";
 
 interface ScoreboardProps {
   player1Name: string;
-  player2Name: string;
+  player2Name:string;
   player1Score: number;
   player2Score: number;
   player1GamesWon: number;
@@ -11,42 +13,21 @@ interface ScoreboardProps {
   server: 0 | 1 | null;
   onPlayer1Point: () => void;
   onPlayer2Point: () => void;
-  previousScores: [number, number][];
   currentGameIndex: number;
+  player1Color: string;
+  player2Color: string;
 }
 
-// Custom SVG for shuttlecock icon
-const ShuttlecockIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M18.5 7.5C18.5 9.43 16.93 11 15 11C13.07 11 11.5 9.43 11.5 7.5C11.5 5.57 13.07 4 15 4C16.93 4 18.5 5.57 18.5 7.5Z M13 11.5L9.5 15L10.5 16L14 12.5L13 11.5Z M7 17.5L5.5 19L9 22.5L10.5 21L7 17.5Z M17 12.5L20.5 16L19.5 17L16 13.5L17 12.5Z" />
-  </svg>
-);
-
-
-const CourtCell = ({
-  children,
-  className,
-  onClick,
-}: {
-  children?: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-}) => (
-  <div
-    className={cn(
-      "border-primary flex items-center justify-center border-2",
-      className
-    )}
-    onClick={onClick}
-  >
-    {children}
-  </div>
-);
+const getContrastingTextColor = (hexcolor: string) => {
+  if (hexcolor.startsWith("#")) {
+    hexcolor = hexcolor.slice(1);
+  }
+  const r = parseInt(hexcolor.substring(0, 2), 16);
+  const g = parseInt(hexcolor.substring(2, 4), 16);
+  const b = parseInt(hexcolor.substring(4, 6), 16);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? "black" : "white";
+};
 
 export function Scoreboard({
   player1Name,
@@ -58,8 +39,9 @@ export function Scoreboard({
   server,
   onPlayer1Point,
   onPlayer2Point,
-  previousScores,
   currentGameIndex,
+  player1Color,
+  player2Color,
 }: ScoreboardProps) {
 
   const swapSides = currentGameIndex % 2 === 1;
@@ -70,7 +52,7 @@ export function Scoreboard({
     gamesWon: swapSides ? player2GamesWon : player1GamesWon,
     server: swapSides ? 1 : 0,
     onPoint: swapSides ? onPlayer2Point : onPlayer1Point,
-    previousGameScores: previousScores.map(score => score[swapSides ? 1 : 0])
+    color: swapSides ? player2Color : player1Color,
   };
 
   const playerRight = {
@@ -79,63 +61,56 @@ export function Scoreboard({
     gamesWon: swapSides ? player1GamesWon : player2GamesWon,
     server: swapSides ? 0 : 1,
     onPoint: swapSides ? onPlayer1Point : onPlayer2Point,
-    previousGameScores: previousScores.map(score => score[swapSides ? 0 : 1])
+    color: swapSides ? player1Color : player2Color,
   };
 
-  const getPreviousScore = (player: 'left' | 'right', gameIndex: number) => {
-    if (gameIndex >= currentGameIndex) return null;
-    const score = player === 'left' ? playerLeft.previousGameScores[gameIndex] : playerRight.previousGameScores[gameIndex];
-    const opponentScore = player === 'left' ? playerRight.previousGameScores[gameIndex] : playerLeft.previousGameScores[gameIndex];
-
-    const didWin = score > opponentScore && (score >= 21 || score === 30);
-    
-    return (
-        <span className={cn(didWin && "text-accent font-bold")}>{score}</span>
-    )
-  }
-
   return (
-    <div className="grid h-[60vh] max-h-[800px] w-full grid-cols-[1fr_6fr_6fr_1fr] grid-rows-[auto_1fr_1fr_1fr] gap-0.5 bg-background font-bold">
-      {/* Names */}
-      <CourtCell className="border-b-0 row-start-1 col-start-2">{playerLeft.name}</CourtCell>
-      <CourtCell className="border-b-0 row-start-1 col-start-3">{playerRight.name}</CourtCell>
-      
-      {/* Previous Scores */}
-      <CourtCell className="row-start-2 col-start-1">{getPreviousScore('left', 0)}</CourtCell>
-      <CourtCell className="row-start-3 col-start-1">{getPreviousScore('left', 1)}</CourtCell>
-      <CourtCell className="row-start-2 col-start-4">{getPreviousScore('right', 0)}</CourtCell>
-      <CourtCell className="row-start-3 col-start-4">{getPreviousScore('right', 1)}</CourtCell>
-
-      {/* Main Scores */}
-      <CourtCell
-        className="relative cursor-pointer text-[18vh] leading-none row-start-2 col-start-2 row-span-2"
+    <div className="grid grid-cols-2 w-full h-[60vh] max-h-[800px] text-6xl md:text-8xl lg:text-9xl font-bold border-4 border-primary rounded-lg overflow-hidden">
+      {/* Player Left */}
+      <div
+        className="relative flex flex-col items-center justify-center cursor-pointer p-4"
+        style={{
+          backgroundColor: playerLeft.color,
+          color: getContrastingTextColor(playerLeft.color),
+        }}
         onClick={playerLeft.onPoint}
       >
-        {playerLeft.score}
+        <div className="absolute top-4 text-2xl font-bold tracking-tight">
+          {playerLeft.name}
+        </div>
+        <div className="absolute top-12 text-xl font-semibold">
+          Game: {playerLeft.gamesWon}
+        </div>
+        <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
+          {playerLeft.score}
+        </div>
         {server === playerLeft.server && (
-            <ShuttlecockIcon className="absolute right-4 top-4 h-8 w-8 text-foreground animate-pulse" />
+           <ShuttlecockIcon className="absolute bottom-4 h-10 w-10 animate-pulse" />
         )}
-      </CourtCell>
-      <CourtCell
-        className="relative cursor-pointer text-[18vh] leading-none row-start-2 col-start-3 row-span-2"
-        onClick={playerRight.onPoint}
-      >
-        {playerRight.score}
-        {server === playerRight.server && (
-            <ShuttlecockIcon className="absolute right-4 top-4 h-8 w-8 text-foreground animate-pulse" />
-        )}
-      </CourtCell>
-
-      {/* Games Won - Center Top */}
-      <div className="col-start-2 col-span-2 row-start-1 grid grid-cols-2">
-        <div className="col-start-1 flex justify-end items-center pr-2">{playerLeft.gamesWon}</div>
-        <div className="col-start-2 flex justify-start items-center pl-2">{playerRight.gamesWon}</div>
       </div>
 
-       {/* Bottom score boxes, for aesthetic */}
-      <CourtCell className="row-start-4 col-start-2"></CourtCell>
-      <CourtCell className="row-start-4 col-start-3"></CourtCell>
-
+      {/* Player Right */}
+      <div
+        className="relative flex flex-col items-center justify-center cursor-pointer p-4 border-l-2 border-primary"
+        style={{
+          backgroundColor: playerRight.color,
+          color: getContrastingTextColor(playerRight.color),
+        }}
+        onClick={playerRight.onPoint}
+      >
+        <div className="absolute top-4 text-2xl font-bold tracking-tight">
+          {playerRight.name}
+        </div>
+         <div className="absolute top-12 text-xl font-semibold">
+          Game: {playerRight.gamesWon}
+        </div>
+        <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
+          {playerRight.score}
+        </div>
+        {server === playerRight.server && (
+          <ShuttlecockIcon className="absolute bottom-4 h-10 w-10 animate-pulse" />
+        )}
+      </div>
     </div>
   );
 }

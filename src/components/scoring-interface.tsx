@@ -111,9 +111,11 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             player2GamesWon={state.gamesWon[1]}
             server={state.winner === null ? state.server : null}
             onPlayer1Point={() => handleAwardPoint(0)}
-            onPlayer2Point={() => handleAwardPoint(1)}
+            onPlayer2Point={(): void => handleAwardPoint(1)}
             previousScores={state.scores}
             currentGameIndex={state.currentGameIndex}
+            player1Color={state.config.player1Color}
+            player2Color={state.config.player2Color}
         />
 
       {state.winner !== null && (

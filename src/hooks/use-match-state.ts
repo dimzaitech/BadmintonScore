@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from 'react';
-import type { MatchConfig, GameState, PlayerStats } from '@/lib/types';
+import type { MatchConfig, GameState, PlayerStats, MatchData } from '@/lib/types';
 
 const MAX_GAMES = 3;
 const WINNING_SCORE = 21;
@@ -90,27 +90,40 @@ export function useMatchState(config: MatchConfig) {
     const opponentIndex = playerIndex === 0 ? 1 : 0;
     
     // A fault awards a point to the opponent
-    awardPoint(opponentIndex, false);
+    // We need to update the stats before awarding the point to avoid a race condition with state update
+     const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
+     newState.stats[playerIndex].faults++;
+     
+     setHistory(prevHistory => {
+        const newHistory = prevHistory.slice(0, historyIndex + 1);
+        newHistory.push(newState);
+        return newHistory;
+     });
+     setHistoryIndex(prevIndex => prevIndex + 1);
     
-    // We need to update the stats on the latest state
-    setHistory(prevHistory => {
-        const latestState = JSON.parse(JSON.stringify(prevHistory[prevHistory.length - 1])) as GameState;
-        latestState.stats[playerIndex].faults++;
-        return [...prevHistory.slice(0, -1), latestState];
-    });
+    awardPoint(opponentIndex, false);
 
-  }, [currentState.winner, awardPoint]);
+  }, [currentState, awardPoint, history, historyIndex]);
 
   const saveMatch = useCallback((summary?: string) => {
-    const matchData = {
+    if(currentState.winner === null) return; // Only save completed matches
+
+    const matchData: MatchData = {
         ...currentState,
         id: new Date().toISOString(),
         timestamp: Date.now(),
         summary: summary || '',
     };
-    const history = JSON.parse(localStorage.getItem(MATCH_HISTORY_KEY) || '[]') as GameState[];
-    history.push(matchData);
-    localStorage.setItem(MATCH_HISTORY_KEY, JSON.stringify(history));
+    try {
+        const history = JSON.parse(localStorage.getItem(MATCH_HISTORY_KEY) || '[]') as MatchData[];
+        // Avoid duplicates
+        if (!history.find(m => m.id === matchData.id)) {
+            history.push(matchData);
+            localStorage.setItem(MATCH_HISTORY_KEY, JSON.stringify(history));
+        }
+    } catch (error) {
+        console.error("Gagal menyimpan riwayat pertandingan:", error);
+    }
   }, [currentState]);
 
 

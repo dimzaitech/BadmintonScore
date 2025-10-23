@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMatchState } from '@/hooks/use-match-state';
 import type { MatchConfig } from '@/lib/types';
 import { Scoreboard } from '@/components/scoreboard';
@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Undo, Redo, PlusCircle, AlertCircle, Sparkles, RefreshCw, Save } from 'lucide-react';
+import { Undo, Redo, PlusCircle, AlertCircle, Sparkles, RefreshCw, Timer } from 'lucide-react';
 import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
   AlertDialog,
@@ -29,6 +29,39 @@ interface ScoringInterfaceProps {
   matchConfig: MatchConfig;
   onNewMatch: () => void;
 }
+
+function TimerDisplay() {
+  const [time, setTime] = useState(0);
+  const [isRunning, setIsRunning] = useState(true);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (isRunning) {
+      interval = setInterval(() => {
+        setTime(prevTime => prevTime + 1);
+      }, 1000);
+    } else if (!isRunning && time !== 0) {
+      if (interval) clearInterval(interval);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRunning, time]);
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60).toString().padStart(2, '0');
+    const seconds = (time % 60).toString().padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  };
+
+  return (
+    <div className="flex items-center gap-2 text-sm font-mono text-muted-foreground">
+        <Timer className="h-4 w-4" />
+        <span>{formatTime(time)}</span>
+    </div>
+  )
+}
+
 
 export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfaceProps) {
   const { state, awardPoint, addFault, undo, redo, canUndo, canRedo, saveMatch } = useMatchState(matchConfig);
@@ -72,6 +105,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             <div className="flex justify-between items-center">
               <CardTitle className="text-xl md:text-2xl">Pertandingan Saat Ini</CardTitle>
               <div className="flex items-center space-x-2">
+                <TimerDisplay />
                 <Button onClick={undo} disabled={!canUndo} variant="outline" size="icon" aria-label="Batal"><Undo className="h-4 w-4" /></Button>
                 <Button onClick={redo} disabled={!canRedo} variant="outline" size="icon" aria-label="Ulangi"><Redo className="h-4 w-4" /></Button>
               </div>

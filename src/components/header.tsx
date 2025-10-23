@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { History, Trophy } from 'lucide-react';
+import { History, Trophy, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function Header() {
@@ -14,13 +14,18 @@ export function Header() {
             </span>
           </Link>
         </div>
-        <div className="flex flex-1 items-center justify-end space-x-2">
+        <nav className="flex flex-1 items-center justify-end space-x-2">
+          <Button variant="ghost" size="icon" asChild>
+            <Link href="/stats" aria-label="Statistik">
+              <BarChart3 className="h-5 w-5" />
+            </Link>
+          </Button>
           <Button variant="ghost" size="icon" asChild>
             <Link href="/history" aria-label="Riwayat Pertandingan">
               <History className="h-5 w-5" />
             </Link>
           </Button>
-        </div>
+        </nav>
       </div>
     </header>
   );

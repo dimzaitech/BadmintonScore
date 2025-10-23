@@ -30,12 +30,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Rocket } from "lucide-react";
+import { Rocket, Users, User, ShieldCheck } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
   player1Name: z.string().min(1, "Nama Pemain 1 harus diisi.").max(50),
   player2Name: z.string().min(1, "Nama Pemain 2 harus diisi.").max(50),
+  matchType: z.enum(["tunggal", "ganda"]).default("tunggal"),
   firstServer: z.enum(["0", "1"]),
+  tournamentMode: z.boolean().default(false),
 });
 
 type MatchSetupFormValues = z.infer<typeof formSchema>;
@@ -50,9 +54,13 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     defaultValues: {
       player1Name: "Pemain 1",
       player2Name: "Pemain 2",
+      matchType: "tunggal",
       firstServer: "0",
+      tournamentMode: false,
     },
   });
+
+  const matchType = form.watch("matchType");
 
   function onSubmit(values: MatchSetupFormValues) {
     onMatchStart({
@@ -68,7 +76,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
       <CardHeader>
         <CardTitle className="text-2xl">Pertandingan Bulu Tangkis Baru</CardTitle>
         <CardDescription>
-          Konfigurasikan nama pemain dan siapa yang melakukan servis pertama untuk memulai.
+          Konfigurasikan detail pertandingan untuk memulai.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -76,12 +84,43 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
           <CardContent className="space-y-6">
             <FormField
               control={form.control}
+              name="matchType"
+              render={({ field }) => (
+                <FormItem className="space-y-3">
+                  <FormLabel>Tipe Pertandingan</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex space-x-4"
+                    >
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="tunggal" />
+                        </FormControl>
+                        <FormLabel className="font-normal flex items-center gap-2"><User /> Tunggal</FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-2 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="ganda" />
+                        </FormControl>
+                        <FormLabel className="font-normal flex items-center gap-2"><Users /> Ganda</FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
               name="player1Name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Pemain 1</FormLabel>
+                  <FormLabel>{matchType === 'tunggal' ? 'Nama Pemain 1' : 'Nama Tim 1'}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan nama Pemain 1" {...field} />
+                    <Input placeholder={matchType === 'tunggal' ? 'Masukkan nama pemain' : 'Masukkan nama tim'} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,9 +131,9 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
               name="player2Name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Pemain 2</FormLabel>
+                  <FormLabel>{matchType === 'tunggal' ? 'Nama Pemain 2' : 'Nama Tim 2'}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Masukkan nama Pemain 2" {...field} />
+                    <Input placeholder={matchType === 'tunggal' ? 'Masukkan nama pemain' : 'Masukkan nama tim'} {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -121,6 +160,24 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                     </SelectContent>
                   </Select>
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tournamentMode"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                  <div className="space-y-0.5">
+                    <FormLabel className="flex items-center gap-2"><ShieldCheck /> Mode Turnamen</FormLabel>
+                    <FormMessage />
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
                 </FormItem>
               )}
             />

@@ -67,13 +67,6 @@ export function Scoreboard({
     return score % 2 === 0 ? "right-4" : "left-4";
   };
   
-  const getNamePositionClass = (isServing: boolean, score: number) => {
-    if (!isServing) {
-      return "inset-x-0 text-center";
-    }
-    return score % 2 === 0 ? "right-4" : "left-4";
-  };
-
   return (
     <div className="relative w-full h-[60vh] max-h-[800px] border-4 border-primary rounded-lg overflow-hidden">
       <div className="grid grid-cols-2 w-full h-full text-6xl md:text-8xl lg:text-9xl font-bold">
@@ -86,10 +79,7 @@ export function Scoreboard({
           }}
           onClick={playerLeft.onPoint}
         >
-          <div className={cn(
-              "absolute top-4 text-2xl font-bold tracking-tight",
-              getNamePositionClass(server === playerLeft.serverIndex, playerLeft.score)
-            )}>
+          <div className="absolute top-4 inset-x-0 text-center text-2xl font-bold tracking-tight">
             {playerLeft.name}
           </div>
           <div className="absolute top-12 text-xl font-semibold">
@@ -126,10 +116,7 @@ export function Scoreboard({
           }}
           onClick={playerRight.onPoint}
         >
-          <div className={cn(
-              "absolute top-4 text-2xl font-bold tracking-tight",
-               getNamePositionClass(server === playerRight.serverIndex, playerRight.score)
-            )}>
+          <div className="absolute top-4 inset-x-0 text-center text-2xl font-bold tracking-tight">
             {playerRight.name}
           </div>
            <div className="absolute top-12 text-xl font-semibold">

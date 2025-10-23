@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -35,12 +36,22 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const formSchema = z.object({
   player1Name: z.string().min(1, "Nama Pemain 1 harus diisi.").max(50),
+  player1bName: z.string().max(50).optional(),
   player2Name: z.string().min(1, "Nama Pemain 2 harus diisi.").max(50),
+  player2bName: z.string().max(50).optional(),
   player1Color: z.string(),
   player2Color: z.string(),
   matchType: z.enum(["tunggal", "ganda"]).default("tunggal"),
   firstServer: z.enum(["0", "1"]),
   winningScore: z.enum(["10", "15", "21"]).default("21"),
+}).refine(data => {
+    if (data.matchType === 'ganda') {
+        return !!data.player1bName && !!data.player2bName;
+    }
+    return true;
+}, {
+    message: "Nama rekan setim harus diisi untuk mode ganda.",
+    path: ["player1bName"], // you can decide where to show the error
 });
 
 type MatchSetupFormValues = z.infer<typeof formSchema>;
@@ -54,7 +65,9 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       player1Name: "Pemain 1",
+      player1bName: "",
       player2Name: "Pemain 2",
+      player2bName: "",
       player1Color: "#e0f2fe", // light-blue
       player2Color: "#fee2e2", // light-red
       matchType: "tunggal",
@@ -66,9 +79,17 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
   const matchType = form.watch("matchType");
 
   function onSubmit(values: MatchSetupFormValues) {
+    let team1Name = values.player1Name;
+    let team2Name = values.player2Name;
+
+    if (values.matchType === 'ganda' && values.player1bName && values.player2bName) {
+        team1Name = `${values.player1Name} / ${values.player1bName}`;
+        team2Name = `${values.player2Name} / ${values.player2bName}`;
+    }
+
     onMatchStart({
-      player1Name: values.player1Name,
-      player2Name: values.player2Name,
+      player1Name: team1Name,
+      player2Name: team2Name,
       numberOfGames: 3, // Best of 3 games
       firstServer: parseInt(values.firstServer, 10) as 0 | 1,
       player1Color: values.player1Color,
@@ -76,6 +97,10 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
       winningScore: parseInt(values.winningScore, 10) as 10 | 15 | 21,
     });
   }
+
+  const team1DisplayName = matchType === 'ganda' ? `${form.watch("player1Name")} / ${form.watch("player1bName") || '...'}` : form.watch("player1Name");
+  const team2DisplayName = matchType === 'ganda' ? `${form.watch("player2Name")} / ${form.watch("player2bName") || '...'}` : form.watch("player2Name");
+
 
   return (
     <Card className="w-full max-w-md animate-in fade-in-0 zoom-in-95">
@@ -118,59 +143,97 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                 </FormItem>
               )}
             />
+            
+            <div className="rounded-md border p-4 space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+                    <div className="space-y-2">
+                        <FormLabel>{matchType === 'tunggal' ? 'Pemain 1' : 'Tim 1'}</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="player1Name"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                <Input placeholder={matchType === 'ganda' ? 'Pemain 1A' : 'Nama Pemain 1'} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        {matchType === 'ganda' && (
+                            <FormField
+                                control={form.control}
+                                name="player1bName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                    <Input placeholder="Pemain 1B" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        )}
+                    </div>
+                  <FormField
+                    control={form.control}
+                    name="player1Color"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
-              <FormField
-                control={form.control}
-                name="player1Name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{matchType === 'tunggal' ? 'Nama Pemain 1' : 'Nama Tim 1'}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={matchType === 'tunggal' ? 'Masukkan nama pemain' : 'Masukkan nama tim'} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="player1Color"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
+            <div className="rounded-md border p-4 space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
+                     <div className="space-y-2">
+                        <FormLabel>{matchType === 'tunggal' ? 'Pemain 2' : 'Tim 2'}</FormLabel>
+                        <FormField
+                            control={form.control}
+                            name="player2Name"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormControl>
+                                <Input placeholder={matchType === 'ganda' ? 'Pemain 2A' : 'Nama Pemain 2'} {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        {matchType === 'ganda' && (
+                            <FormField
+                                control={form.control}
+                                name="player2bName"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <FormControl>
+                                    <Input placeholder="Pemain 2B" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        )}
+                    </div>
+                  <FormField
+                    control={form.control}
+                    name="player2Color"
+                    render={({ field }) => (
+                      <FormItem>
+                         <FormControl>
+                          <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
             </div>
-             <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4 items-end">
-              <FormField
-                control={form.control}
-                name="player2Name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{matchType === 'tunggal' ? 'Nama Pemain 2' : 'Nama Tim 2'}</FormLabel>
-                    <FormControl>
-                      <Input placeholder={matchType === 'tunggal' ? 'Masukkan nama pemain' : 'Masukkan nama tim'} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="player2Color"
-                render={({ field }) => (
-                  <FormItem>
-                     <FormControl>
-                      <Input type="color" {...field} className="p-1 h-10 w-14 cursor-pointer" />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            </div>
+
 
             <div className="grid grid-cols-2 gap-4">
                <FormField
@@ -189,8 +252,8 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="0">{form.watch("player1Name")}</SelectItem>
-                        <SelectItem value="1">{form.watch("player2Name")}</SelectItem>
+                        <SelectItem value="0">{team1DisplayName}</SelectItem>
+                        <SelectItem value="1">{team2DisplayName}</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -232,3 +295,5 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     </Card>
   );
 }
+
+    

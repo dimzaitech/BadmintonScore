@@ -25,6 +25,7 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background font-body antialiased",
         )}
+        suppressHydrationWarning={true}
       >
         <div className="relative flex min-h-screen flex-col">
           <Header />

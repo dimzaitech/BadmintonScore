@@ -23,11 +23,11 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          "min-h-screen bg-background font-body antialiased",
+          "min-h-screen bg-neutral-900 font-body antialiased",
         )}
         suppressHydrationWarning={true}
       >
-        <div className="relative flex min-h-screen flex-col">
+        <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-x border-neutral-700 bg-background shadow-2xl">
           <Header />
           <main className="flex-1">{children}</main>
         </div>

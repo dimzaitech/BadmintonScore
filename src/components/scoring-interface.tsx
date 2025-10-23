@@ -9,7 +9,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Undo, Redo, PlusCircle, AlertCircle, Sparkles, RefreshCw, Timer } from 'lucide-react';
+import { Undo, Redo, AlertCircle, Sparkles, RefreshCw, Timer } from 'lucide-react';
 import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
   AlertDialog,
@@ -120,12 +120,14 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             player1GamesWon={state.gamesWon[0]}
             player2GamesWon={state.gamesWon[1]}
             server={state.winner === null ? state.server : null}
+            onPlayer1Point={() => handleAwardPoint(0)}
+            onPlayer2Point={() => handleAwardPoint(1)}
           />
         </CardContent>
         {state.winner === null ? (
           <CardFooter className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <PlayerControls name={state.config.player1Name} onPoint={() => handleAwardPoint(0)} onFault={() => addFault(0)} isServiceWinner={isP1ServiceWinner} onServiceWinnerChange={setIsP1ServiceWinner} />
-              <PlayerControls name={state.config.player2Name} onPoint={() => handleAwardPoint(1)} onFault={() => addFault(1)} isServiceWinner={isP2ServiceWinner} onServiceWinnerChange={setIsP2ServiceWinner} />
+              <PlayerControls name={state.config.player1Name} onFault={() => addFault(0)} isServiceWinner={isP1ServiceWinner} onServiceWinnerChange={setIsP1ServiceWinner} />
+              <PlayerControls name={state.config.player2Name} onFault={() => addFault(1)} isServiceWinner={isP2ServiceWinner} onServiceWinnerChange={setIsP2ServiceWinner} />
           </CardFooter>
         ) : null}
       </Card>
@@ -174,11 +176,10 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   );
 }
 
-function PlayerControls({ name, onPoint, onFault, isServiceWinner, onServiceWinnerChange }: { name: string, onPoint: () => void, onFault: () => void, isServiceWinner: boolean, onServiceWinnerChange: (checked: boolean) => void }) {
+function PlayerControls({ name, onFault, isServiceWinner, onServiceWinnerChange }: { name: string, onFault: () => void, isServiceWinner: boolean, onServiceWinnerChange: (checked: boolean) => void }) {
   return (
     <div className="space-y-3 rounded-lg border p-4">
       <h3 className="font-semibold text-center truncate">{name}</h3>
-      <Button onClick={onPoint} className="w-full"><PlusCircle className="mr-2 h-4 w-4" />Beri Poin</Button>
       <div className="flex items-center space-x-2">
         <Checkbox id={`sw-${name}`} checked={isServiceWinner} onCheckedChange={(checked) => onServiceWinnerChange(checked as boolean)} />
         <Label htmlFor={`sw-${name}`} className="text-sm">Pemenang Servis</Label>

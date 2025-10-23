@@ -9,9 +9,11 @@ interface ScoreboardProps {
   player1GamesWon: number;
   player2GamesWon: number;
   server: 0 | 1 | null;
+  onPlayer1Point: () => void;
+  onPlayer2Point: () => void;
 }
 
-export function Scoreboard({ player1Name, player2Name, player1Score, player2Score, player1GamesWon, player2GamesWon, server }: ScoreboardProps) {
+export function Scoreboard({ player1Name, player2Name, player1Score, player2Score, player1GamesWon, player2GamesWon, server, onPlayer1Point, onPlayer2Point }: ScoreboardProps) {
   return (
     <div className="grid grid-cols-2 gap-4 rounded-lg bg-card-foreground text-card p-4 md:p-6 shadow-lg">
       {/* Player 1 */}
@@ -21,7 +23,11 @@ export function Scoreboard({ player1Name, player2Name, player1Score, player2Scor
           <span className="truncate">{player1Name}</span>
           {server === 0 && <Server className="h-5 w-5 text-accent animate-pulse" />}
         </div>
-        <div key={`p1-${player1Score}`} className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500">
+        <div
+          key={`p1-${player1Score}`}
+          className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
+          onClick={onPlayer1Point}
+        >
           {player1Score}
         </div>
         <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Game: {player1GamesWon}</div>
@@ -34,7 +40,11 @@ export function Scoreboard({ player1Name, player2Name, player1Score, player2Scor
           <span className="truncate">{player2Name}</span>
           {server === 1 && <Server className="h-5 w-5 text-accent animate-pulse" />}
         </div>
-        <div key={`p2-${player2Score}`} className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500">
+        <div
+          key={`p2-${player2Score}`}
+          className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
+          onClick={onPlayer2Point}
+        >
           {player2Score}
         </div>
         <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Game: {player2GamesWon}</div>

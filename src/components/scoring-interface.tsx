@@ -6,7 +6,6 @@ import type { MatchConfig } from '@/lib/types';
 import { Scoreboard } from '@/components/scoreboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import { Undo, Redo, Sparkles, RefreshCw, Timer } from 'lucide-react';
 import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
@@ -67,7 +66,9 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   const [showSummary, setShowSummary] = useState(false);
   
   const handleAwardPoint = (player: 0 | 1) => {
-    awardPoint(player, false);
+    if (state.winner === null) {
+      awardPoint(player);
+    }
   };
   
   const handleSaveMatch = (summary?: string) => {
@@ -118,11 +119,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
           />
         </CardContent>
       </Card>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-          <StatDisplay label="Pemenang Servis" p1Stat={state.stats[0].serviceWinners} p2Stat={state.stats[1].serviceWinners} />
-          <StatDisplay label="Kesalahan" p1Stat={state.stats[0].faults} p2Stat={state.stats[1].faults} />
-      </div>
 
       {state.winner !== null && (
         <Card className="text-center animate-in fade-in-50 zoom-in-95">
@@ -161,19 +157,4 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       {showSummary && statsInput && <MatchSummaryCard statsInput={statsInput} />}
     </div>
   );
-}
-
-function StatDisplay({ label, p1Stat, p2Stat }: { label: string, p1Stat: number, p2Stat: number }) {
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="text-lg font-medium">{label}</CardTitle>
-            </CardHeader>
-            <CardContent className="flex justify-around items-center">
-                <span className="text-2xl font-bold">{p1Stat}</span>
-                <Separator orientation="vertical" className="h-8"/>
-                <span className="text-2xl font-bold">{p2Stat}</span>
-            </CardContent>
-        </Card>
-    )
 }

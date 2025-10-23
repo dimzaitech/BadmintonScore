@@ -49,7 +49,7 @@ export function useMatchState(config: MatchConfig) {
     }
   }, [canRedo]);
   
-  const awardPoint = useCallback((playerIndex: 0 | 1, isServiceWinner: boolean) => {
+  const awardPoint = useCallback((playerIndex: 0 | 1) => {
     if (currentState.winner !== null) return;
 
     const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
@@ -59,11 +59,6 @@ export function useMatchState(config: MatchConfig) {
     
     // Update server
     newState.server = playerIndex;
-
-    // Update stats
-    if (isServiceWinner) {
-      newState.stats[playerIndex].serviceWinners++;
-    }
 
     // Check for game/match win
     const [p1Score, p2Score] = newState.scores[newState.currentGameIndex];

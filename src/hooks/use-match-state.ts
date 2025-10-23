@@ -54,24 +54,12 @@ export function useMatchState(config: MatchConfig) {
     if (currentState.winner !== null) return;
 
     const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
-
-    const previousServer = newState.server;
     
     // Update score
     newState.scores[newState.currentGameIndex][playerIndex]++;
     
     // Update server
     newState.server = playerIndex;
-
-    // In doubles, if serving team wins a point, the players switch sides.
-    if (newState.config.matchType === 'ganda' && playerIndex === previousServer) {
-        if (playerIndex === 0) {
-            newState.team1Position = newState.team1Position === 0 ? 1 : 0;
-        } else {
-            newState.team2Position = newState.team2Position === 0 ? 1 : 0;
-        }
-    }
-
 
     // Check for game/match win
     const [p1Score, p2Score] = newState.scores[newState.currentGameIndex];
@@ -138,7 +126,6 @@ export function useMatchState(config: MatchConfig) {
 
 
 function checkGameWinner(p1Score: number, p2Score: number, winningScore: number): 0 | 1 | null {
-  const deuceScore = winningScore - 1;
   const capScore = winningScore === 21 ? 30 : (winningScore === 15 ? 20 : 15);
 
   // Check for cap score win

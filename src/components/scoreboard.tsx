@@ -33,56 +33,13 @@ export function Scoreboard({
   onSwapSides,
 }: ScoreboardProps) {
 
-  const { config, scores, currentGameIndex, gamesWon, server, sidesSwapped, team1Position, team2Position } = state;
-
-  const getDoublesPlayerNames = (teamIndex: 0 | 1, currentScore: number, teamPosition: 0 | 1) => {
-    if (config.matchType !== 'ganda' || !config.team1_player1 || !config.team1_player2 || !config.team2_player1 || !config.team2_player2) {
-      return teamIndex === 0 ? config.player1Name : config.player2Name;
-    }
-
-    const team1P1 = config.team1_player1;
-    const team1P2 = config.team1_player2;
-    const team2P1 = config.team2_player1;
-    const team2P2 = config.team2_player2;
-
-    let p1, p2;
-
-    if (teamIndex === 0) {
-      p1 = team1P1;
-      p2 = team1P2;
-    } else {
-      p1 = team2P1;
-      p2 = team2P2;
-    }
-
-    // At the start of the game, the player who serves is determined by firstServer.
-    // Let's assume the serving player starts on the right (even score).
-    const isServingTeam = server === teamIndex;
-    const isScoreEven = currentScore % 2 === 0;
-
-    // 'teamPosition' tracks the server-receiver swap. 0 = initial, 1 = swapped.
-    // The player on the right for an even score is the initial server.
-    // The player on the left for an odd score is the initial server's partner.
-    if (isServingTeam) {
-      if (isScoreEven) {
-        // server is on the right
-        return teamPosition === 0 ? `${p2} / ${p1}` : `${p1} / ${p2}`;
-      } else {
-        // server is on the left
-        return teamPosition === 0 ? `${p1} / ${p2}` : `${p2} / ${p1}`;
-      }
-    } else {
-      // Non-serving team positions are based on their score at last service win.
-      // This simplified logic just shows the fixed pair.
-      return teamPosition === 0 ? `${p1} / ${p2}` : `${p2} / ${p1}`;
-    }
-  };
+  const { config, scores, currentGameIndex, gamesWon, server, sidesSwapped } = state;
 
   const p1Score = scores[currentGameIndex][0];
   const p2Score = scores[currentGameIndex][1];
 
-  const player1Name = getDoublesPlayerNames(0, p1Score, team1Position);
-  const player2Name = getDoublesPlayerNames(1, p2Score, team2Position);
+  const player1Name = config.player1Name;
+  const player2Name = config.player2Name;
 
   const playerLeft = {
     name: sidesSwapped ? player2Name : player1Name,
@@ -110,7 +67,10 @@ export function Scoreboard({
     return score % 2 === 0 ? "right-4" : "left-4";
   };
   
-  const getNamePositionClass = (score: number) => {
+  const getNamePositionClass = (isServing: boolean, score: number) => {
+    if (!isServing) {
+      return "inset-x-0 text-center";
+    }
     return score % 2 === 0 ? "right-4" : "left-4";
   };
 
@@ -128,7 +88,7 @@ export function Scoreboard({
         >
           <div className={cn(
               "absolute top-4 text-2xl font-bold tracking-tight",
-              server === playerLeft.serverIndex ? getNamePositionClass(playerLeft.score) : "inset-x-0 text-center"
+              getNamePositionClass(server === playerLeft.serverIndex, playerLeft.score)
             )}>
             {playerLeft.name}
           </div>
@@ -168,7 +128,7 @@ export function Scoreboard({
         >
           <div className={cn(
               "absolute top-4 text-2xl font-bold tracking-tight",
-              server === playerRight.serverIndex ? getNamePositionClass(playerRight.score) : "inset-x-0 text-center"
+               getNamePositionClass(server === playerRight.serverIndex, playerRight.score)
             )}>
             {playerRight.name}
           </div>

@@ -2,11 +2,6 @@ export type MatchConfig = {
   player1Name: string; // For singles, or team name for doubles
   player2Name: string; // For singles, or team name for doubles
   
-  // Doubles-specific player names
-  team1_player1?: string;
-  team1_player2?: string;
-  team2_player1?: string;
-  team2_player2?: string;
   matchType: "tunggal" | "ganda";
 
   numberOfGames: number;

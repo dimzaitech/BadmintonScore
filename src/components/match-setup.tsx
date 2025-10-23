@@ -93,10 +93,6 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     if (values.matchType === 'ganda' && values.player1bName && values.player2bName) {
         config.player1Name = `${values.player1Name} / ${values.player1bName}`;
         config.player2Name = `${values.player2Name} / ${values.player2bName}`;
-        config.team1_player1 = values.player1Name;
-        config.team1_player2 = values.player1bName;
-        config.team2_player1 = values.player2Name;
-        config.team2_player2 = values.player2bName;
     }
 
     onMatchStart(config);
@@ -315,3 +311,5 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     </Card>
   );
 }
+
+    

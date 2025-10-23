@@ -30,9 +30,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Rocket, Users, User, ShieldCheck } from "lucide-react";
+import { Rocket, Users, User } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
 
 const formSchema = z.object({
   player1Name: z.string().min(1, "Nama Pemain 1 harus diisi.").max(50),
@@ -41,7 +40,6 @@ const formSchema = z.object({
   player2Color: z.string(),
   matchType: z.enum(["tunggal", "ganda"]).default("tunggal"),
   firstServer: z.enum(["0", "1"]),
-  tournamentMode: z.boolean().default(false),
   winningScore: z.enum(["10", "15", "21"]).default("21"),
 });
 
@@ -61,7 +59,6 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
       player2Color: "#fee2e2", // light-red
       matchType: "tunggal",
       firstServer: "0",
-      tournamentMode: false,
       winningScore: "21",
     },
   });
@@ -223,25 +220,6 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                 )}
               />
             </div>
-           
-            <FormField
-              control={form.control}
-              name="tournamentMode"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                  <div className="space-y-0.5">
-                    <FormLabel className="flex items-center gap-2"><ShieldCheck /> Mode Turnamen</FormLabel>
-                    <FormMessage />
-                  </div>
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
           </CardContent>
           <CardFooter>
             <Button type="submit" className="w-full">

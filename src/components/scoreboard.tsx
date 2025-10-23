@@ -13,6 +13,7 @@ interface ScoreboardProps {
   onPlayer2Point: () => void;
   player1Color: string;
   player2Color: string;
+  currentGameIndex: number;
 }
 
 // Helper to determine text color based on background luminance
@@ -27,53 +28,75 @@ function getContrastingTextColor(hexcolor: string): string {
 }
 
 
-export function Scoreboard({ player1Name, player2Name, player1Score, player2Score, player1GamesWon, player2GamesWon, server, onPlayer1Point, onPlayer2Point, player1Color, player2Color }: ScoreboardProps) {
+export function Scoreboard({ player1Name, player2Name, player1Score, player2Score, player1GamesWon, player2GamesWon, server, onPlayer1Point, onPlayer2Point, player1Color, player2Color, currentGameIndex }: ScoreboardProps) {
   
   const player1TextColor = getContrastingTextColor(player1Color);
   const player2TextColor = getContrastingTextColor(player2Color);
 
+  const swapSides = currentGameIndex % 2 === 1;
+
+  const playerLeft = {
+    name: swapSides ? player2Name : player1Name,
+    score: swapSides ? player2Score : player1Score,
+    gamesWon: swapSides ? player2GamesWon : player1GamesWon,
+    color: swapSides ? player2Color : player1Color,
+    textColor: swapSides ? player2TextColor : player1TextColor,
+    server: swapSides ? 1 : 0,
+    onPoint: swapSides ? onPlayer2Point : onPlayer1Point,
+  };
+
+  const playerRight = {
+    name: swapSides ? player1Name : player2Name,
+    score: swapSides ? player1Score : player2Score,
+    gamesWon: swapSides ? player1GamesWon : player2GamesWon,
+    color: swapSides ? player1Color : player2Color,
+    textColor: swapSides ? player1TextColor : player2TextColor,
+    server: swapSides ? 0 : 1,
+    onPoint: swapSides ? onPlayer1Point : onPlayer2Point,
+  };
+
   return (
     <div className="grid grid-cols-2 gap-2 rounded-lg overflow-hidden shadow-lg">
-      {/* Player 1 */}
+      {/* Player Left */}
       <div 
         className="text-center p-4 transition-colors duration-300"
-        style={{ backgroundColor: player1Color, color: player1TextColor }}
+        style={{ backgroundColor: playerLeft.color, color: playerLeft.textColor }}
       >
-        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: player1TextColor }}>
+        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: playerLeft.textColor }}>
           <User className="h-5 w-5" />
-          <span className="truncate">{player1Name}</span>
-          {server === 0 && <Server className="h-5 w-5 text-accent animate-pulse" />}
+          <span className="truncate">{playerLeft.name}</span>
+          {server === playerLeft.server && <Server className="h-5 w-5 text-accent animate-pulse" />}
         </div>
         <div
-          key={`p1-${player1Score}`}
+          key={`p-left-${playerLeft.score}`}
           className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
-          onClick={onPlayer1Point}
-          style={{ color: player1TextColor }}
+          onClick={playerLeft.onPoint}
+          style={{ color: playerLeft.textColor }}
         >
-          {player1Score}
+          {playerLeft.score}
         </div>
-        <div className="text-sm" style={{ color: player1TextColor, opacity: 0.8 }}>Game: {player1GamesWon}</div>
+        <div className="text-sm" style={{ color: playerLeft.textColor, opacity: 0.8 }}>Game: {playerLeft.gamesWon}</div>
       </div>
 
-      {/* Player 2 */}
+      {/* Player Right */}
       <div 
         className="text-center p-4 transition-colors duration-300"
-        style={{ backgroundColor: player2Color, color: player2TextColor }}
+        style={{ backgroundColor: playerRight.color, color: playerRight.textColor }}
       >
-        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: player2TextColor }}>
+        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: playerRight.textColor }}>
           <User className="h-5 w-5" />
-          <span className="truncate">{player2Name}</span>
-          {server === 1 && <Server className="h-5 w-5 text-accent animate-pulse" />}
+          <span className="truncate">{playerRight.name}</span>
+          {server === playerRight.server && <Server className="h-5 w-5 text-accent animate-pulse" />}
         </div>
         <div
-          key={`p2-${player2Score}`}
+          key={`p-right-${playerRight.score}`}
           className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
-          onClick={onPlayer2Point}
-          style={{ color: player2TextColor }}
+          onClick={playerRight.onPoint}
+          style={{ color: playerRight.textColor }}
         >
-          {player2Score}
+          {playerRight.score}
         </div>
-        <div className="text-sm" style={{ color: player2TextColor, opacity: 0.8 }}>Game: {player2GamesWon}</div>
+        <div className="text-sm" style={{ color: playerRight.textColor, opacity: 0.8 }}>Game: {playerRight.gamesWon}</div>
       </div>
     </div>
   );

@@ -118,6 +118,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             onPlayer2Point={() => handleAwardPoint(1)}
             player1Color={state.config.player1Color}
             player2Color={state.config.player2Color}
+            currentGameIndex={state.currentGameIndex}
           />
         </CardContent>
       </Card>

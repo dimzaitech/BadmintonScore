@@ -46,7 +46,7 @@ export function useMatchState(config: MatchConfig) {
 
   const redo = useCallback(() => {
     if (canRedo) {
-      setHistoryIndex(prev => prev + 1);
+      setHistoryIndex(prev => prev - 1);
     }
   }, [canRedo]);
   
@@ -145,3 +145,5 @@ function checkMatchWinner(gamesWon: [number, number], maxGames: number): 0 | 1 |
     if(gamesWon[1] === gamesToWin) return 1;
     return null;
 }
+
+    

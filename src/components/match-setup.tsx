@@ -286,7 +286,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Pilih skor" />
-                        </Trigger>
+                        </SelectTrigger>
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="10">10 Poin</SelectItem>
@@ -311,3 +311,5 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
     </Card>
   );
 }
+
+    

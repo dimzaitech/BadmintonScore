@@ -33,8 +33,8 @@ import {
 import { Rocket } from "lucide-react";
 
 const formSchema = z.object({
-  player1Name: z.string().min(1, "Player 1 name is required.").max(50),
-  player2Name: z.string().min(1, "Player 2 name is required.").max(50),
+  player1Name: z.string().min(1, "Nama Pemain 1 harus diisi.").max(50),
+  player2Name: z.string().min(1, "Nama Pemain 2 harus diisi.").max(50),
   firstServer: z.enum(["0", "1"]),
 });
 
@@ -48,8 +48,8 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
   const form = useForm<MatchSetupFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      player1Name: "Player 1",
-      player2Name: "Player 2",
+      player1Name: "Pemain 1",
+      player2Name: "Pemain 2",
       firstServer: "0",
     },
   });
@@ -66,9 +66,9 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
   return (
     <Card className="w-full max-w-md animate-in fade-in-0 zoom-in-95">
       <CardHeader>
-        <CardTitle className="text-2xl">New Badminton Match</CardTitle>
+        <CardTitle className="text-2xl">Pertandingan Bulu Tangkis Baru</CardTitle>
         <CardDescription>
-          Configure player names and who serves first to begin.
+          Konfigurasikan nama pemain dan siapa yang melakukan servis pertama untuk memulai.
         </CardDescription>
       </CardHeader>
       <Form {...form}>
@@ -79,9 +79,9 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
               name="player1Name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Player 1 Name</FormLabel>
+                  <FormLabel>Nama Pemain 1</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter Player 1's name" {...field} />
+                    <Input placeholder="Masukkan nama Pemain 1" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -92,9 +92,9 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
               name="player2Name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Player 2 Name</FormLabel>
+                  <FormLabel>Nama Pemain 2</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter Player 2's name" {...field} />
+                    <Input placeholder="Masukkan nama Pemain 2" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,14 +105,14 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
               name="firstServer"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Who Serves First?</FormLabel>
+                  <FormLabel>Siapa yang Servis Pertama?</FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select who serves first" />
+                        <SelectValue placeholder="Pilih siapa yang servis pertama" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -128,7 +128,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
           <CardFooter>
             <Button type="submit" className="w-full">
               <Rocket className="mr-2 h-4 w-4" />
-              Start Match
+              Mulai Pertandingan
             </Button>
           </CardFooter>
         </form>

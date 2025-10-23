@@ -26,8 +26,8 @@ export function MatchSummaryCard({ statsInput }: MatchSummaryCardProps) {
         console.error(e);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Failed to generate AI match summary.",
+          title: "Kesalahan",
+          description: "Gagal membuat ringkasan pertandingan AI.",
         });
       } finally {
         setIsLoading(false);
@@ -41,7 +41,7 @@ export function MatchSummaryCard({ statsInput }: MatchSummaryCardProps) {
       <CardHeader>
         <CardTitle className="flex items-center">
           <Wand2 className="mr-2 h-5 w-5 text-primary" />
-          AI Generated Match Summary
+          Ringkasan Pertandingan Dihasilkan AI
         </CardTitle>
       </CardHeader>
       <CardContent>

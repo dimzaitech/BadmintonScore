@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Trash2, Trophy } from "lucide-react";
 import { format } from "date-fns";
+import { id } from 'date-fns/locale';
 import { Skeleton } from "@/components/ui/skeleton";
 
 const MATCH_HISTORY_KEY = "smashscore_history";
@@ -28,7 +29,7 @@ export function HistoryList() {
         setHistory(JSON.parse(storedHistory));
       }
     } catch (error) {
-      console.error("Failed to parse match history:", error);
+      console.error("Gagal mem-parsing riwayat pertandingan:", error);
     }
   }, []);
 
@@ -49,8 +50,8 @@ export function HistoryList() {
   if (history.length === 0) {
     return (
       <div className="text-center text-muted-foreground py-10 border-2 border-dashed rounded-lg">
-        <p className="font-semibold">No matches played yet.</p>
-        <p>Go back to the main page to start a new match!</p>
+        <p className="font-semibold">Belum ada pertandingan yang dimainkan.</p>
+        <p>Kembali ke halaman utama untuk memulai pertandingan baru!</p>
       </div>
     );
   }
@@ -59,7 +60,7 @@ export function HistoryList() {
     <div className="space-y-4">
       <div className="flex justify-end">
         <Button variant="destructive" onClick={clearHistory}>
-          <Trash2 className="mr-2 h-4 w-4" /> Clear History
+          <Trash2 className="mr-2 h-4 w-4" /> Hapus Riwayat
         </Button>
       </div>
       {history.slice().reverse().map((match) => (
@@ -72,12 +73,12 @@ export function HistoryList() {
               {match.winner !== null && (
                 <span className="text-sm font-medium text-amber-500 flex items-center bg-amber-500/10 px-2 py-1 rounded-md">
                   <Trophy className="mr-2 h-4 w-4" />
-                  {match.winner === 0 ? match.config.player1Name : match.config.player2Name} won
+                  {match.winner === 0 ? match.config.player1Name : match.config.player2Name} menang
                 </span>
               )}
             </CardTitle>
             <CardDescription>
-              {format(new Date(match.timestamp), "PPP p")}
+              {format(new Date(match.timestamp), "PPP p", { locale: id })}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -93,11 +94,11 @@ export function HistoryList() {
               </div>
             </div>
             <div className="mt-4 text-sm text-muted-foreground text-center">
-              Game scores: {match.scores.filter(s => s[0] !== 0 || s[1] !== 0).map(s => s.join('-')).join(', ')}
+              Skor game: {match.scores.filter(s => s[0] !== 0 || s[1] !== 0).map(s => s.join('-')).join(', ')}
             </div>
             {match.summary && (
               <div className="mt-4 p-4 bg-background rounded-md border">
-                <h4 className="font-semibold mb-2 text-primary">AI Summary</h4>
+                <h4 className="font-semibold mb-2 text-primary">Ringkasan AI</h4>
                 <p className="text-sm whitespace-pre-wrap">{match.summary}</p>
               </div>
             )}

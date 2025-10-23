@@ -24,7 +24,7 @@ export function Scoreboard({ player1Name, player2Name, player1Score, player2Scor
         <div key={`p1-${player1Score}`} className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500">
           {player1Score}
         </div>
-        <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Games: {player1GamesWon}</div>
+        <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Game: {player1GamesWon}</div>
       </div>
 
       {/* Player 2 */}
@@ -37,7 +37,7 @@ export function Scoreboard({ player1Name, player2Name, player1Score, player2Scor
         <div key={`p2-${player2Score}`} className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500">
           {player2Score}
         </div>
-        <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Games: {player2GamesWon}</div>
+        <div className="text-sm text-muted-foreground bg-card-foreground px-2 py-1 rounded-md">Game: {player2GamesWon}</div>
       </div>
     </div>
   );

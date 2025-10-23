@@ -37,22 +37,22 @@ const prompt = ai.definePrompt({
   name: 'matchStatisticsPrompt',
   input: {schema: MatchStatisticsInputSchema},
   output: {schema: MatchStatisticsOutputSchema},
-  prompt: `You are an expert badminton statistician.
+  prompt: `Anda adalah seorang ahli statistik bulu tangkis.
 
-  Given the following match data, generate a comprehensive summary of the match statistics, including key performance indicators for each player.
+  Berdasarkan data pertandingan berikut, buat ringkasan komprehensif dari statistik pertandingan, termasuk indikator kinerja utama untuk setiap pemain.
 
-  Player 1 Name: {{{player1Name}}}
-  Player 2 Name: {{{player2Name}}}
-  Player 1 Points: {{{player1Points}}}
-  Player 2 Points: {{{player2Points}}}
-  Player 1 Service Winners: {{{player1ServiceWinners}}}
-  Player 2 Service Winners: {{{player2ServiceWinners}}}
-  Player 1 Faults: {{{player1Faults}}}
-  Player 2 Faults: {{{player2Faults}}}
+  Nama Pemain 1: {{{player1Name}}}
+  Nama Pemain 2: {{{player2Name}}}
+  Poin Pemain 1: {{{player1Points}}}
+  Poin Pemain 2: {{{player2Points}}}
+  Pemenang Servis Pemain 1: {{{player1ServiceWinners}}}
+  Pemenang Servis Pemain 2: {{{player2ServiceWinners}}}
+  Kesalahan Pemain 1: {{{player1Faults}}}
+  Kesalahan Pemain 2: {{{player2Faults}}}
 
-  Provide insights into each player's strengths and weaknesses based on the data.
-  Indicate which player has better performance based on key metrics.
-  The summary should be concise and easy to understand.
+  Berikan wawasan tentang kekuatan dan kelemahan setiap pemain berdasarkan data.
+  Tunjukkan pemain mana yang memiliki kinerja lebih baik berdasarkan metrik utama.
+  Ringkasan harus ringkas dan mudah dipahami.
   `,
 });
 

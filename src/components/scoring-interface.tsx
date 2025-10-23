@@ -47,8 +47,8 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   const handleSaveMatch = (summary?: string) => {
     saveMatch(summary);
     toast({
-      title: "Match Saved!",
-      description: "The match has been saved to your history.",
+      title: "Pertandingan Disimpan!",
+      description: "Pertandingan telah disimpan ke riwayat Anda.",
     });
   }
 
@@ -70,10 +70,10 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       <Card>
         <CardHeader>
             <div className="flex justify-between items-center">
-              <CardTitle className="text-xl md:text-2xl">Current Match</CardTitle>
+              <CardTitle className="text-xl md:text-2xl">Pertandingan Saat Ini</CardTitle>
               <div className="flex items-center space-x-2">
-                <Button onClick={undo} disabled={!canUndo} variant="outline" size="icon" aria-label="Undo"><Undo className="h-4 w-4" /></Button>
-                <Button onClick={redo} disabled={!canRedo} variant="outline" size="icon" aria-label="Redo"><Redo className="h-4 w-4" /></Button>
+                <Button onClick={undo} disabled={!canUndo} variant="outline" size="icon" aria-label="Batal"><Undo className="h-4 w-4" /></Button>
+                <Button onClick={redo} disabled={!canRedo} variant="outline" size="icon" aria-label="Ulangi"><Redo className="h-4 w-4" /></Button>
               </div>
             </div>
         </CardHeader>
@@ -97,37 +97,37 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
-          <StatDisplay label="Service Winners" p1Stat={state.stats[0].serviceWinners} p2Stat={state.stats[1].serviceWinners} />
-          <StatDisplay label="Faults" p1Stat={state.stats[0].faults} p2Stat={state.stats[1].faults} />
+          <StatDisplay label="Pemenang Servis" p1Stat={state.stats[0].serviceWinners} p2Stat={state.stats[1].serviceWinners} />
+          <StatDisplay label="Kesalahan" p1Stat={state.stats[0].faults} p2Stat={state.stats[1].faults} />
       </div>
 
       {state.winner !== null && (
         <Card className="text-center animate-in fade-in-50 zoom-in-95">
           <CardHeader>
-            <CardTitle className="text-3xl text-primary">Match Over!</CardTitle>
+            <CardTitle className="text-3xl text-primary">Pertandingan Selesai!</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xl font-semibold">{winnerName} wins the match!</p>
+            <p className="text-xl font-semibold">{winnerName} memenangkan pertandingan!</p>
             <p className="text-muted-foreground">{state.gamesWon.join(' - ')}</p>
           </CardContent>
           <CardFooter className="flex flex-col md:flex-row justify-center gap-4">
             {!showSummary && statsInput && (
-              <Button onClick={() => { setShowSummary(true); handleSaveMatch(); }}><Sparkles className="mr-2 h-4 w-4"/>Generate Match Summary</Button>
+              <Button onClick={() => { setShowSummary(true); handleSaveMatch(); }}><Sparkles className="mr-2 h-4 w-4"/>Buat Ringkasan Pertandingan</Button>
             )}
              <AlertDialog>
                 <AlertDialogTrigger asChild>
-                    <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4"/>New Match</Button>
+                    <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4"/>Pertandingan Baru</Button>
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
                     <AlertDialogDescription>
-                        This will end the current match and start a new one. Your match has been saved.
+                        Ini akan mengakhiri pertandingan saat ini dan memulai yang baru. Pertandingan Anda telah disimpan.
                     </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={onNewMatch}>Start New Match</AlertDialogAction>
+                    <AlertDialogCancel>Batal</AlertDialogCancel>
+                    <AlertDialogAction onClick={onNewMatch}>Mulai Pertandingan Baru</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
@@ -144,13 +144,13 @@ function PlayerControls({ name, onPoint, onFault, isServiceWinner, onServiceWinn
   return (
     <div className="space-y-3 rounded-lg border p-4">
       <h3 className="font-semibold text-center truncate">{name}</h3>
-      <Button onClick={onPoint} className="w-full"><PlusCircle className="mr-2 h-4 w-4" />Award Point</Button>
+      <Button onClick={onPoint} className="w-full"><PlusCircle className="mr-2 h-4 w-4" />Beri Poin</Button>
       <div className="flex items-center space-x-2">
         <Checkbox id={`sw-${name}`} checked={isServiceWinner} onCheckedChange={(checked) => onServiceWinnerChange(checked as boolean)} />
-        <Label htmlFor={`sw-${name}`} className="text-sm">Service Winner</Label>
+        <Label htmlFor={`sw-${name}`} className="text-sm">Pemenang Servis</Label>
       </div>
       <Separator />
-      <Button onClick={onFault} variant="destructive" className="w-full"><AlertCircle className="mr-2 h-4 w-4" />Record Fault</Button>
+      <Button onClick={onFault} variant="destructive" className="w-full"><AlertCircle className="mr-2 h-4 w-4" />Catat Kesalahan</Button>
     </div>
   )
 }

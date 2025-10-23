@@ -116,6 +116,8 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             server={state.winner === null ? state.server : null}
             onPlayer1Point={() => handleAwardPoint(0)}
             onPlayer2Point={() => handleAwardPoint(1)}
+            player1Color={state.config.player1Color}
+            player2Color={state.config.player2Color}
           />
         </CardContent>
       </Card>

@@ -3,6 +3,8 @@ export type MatchConfig = {
   player2Name: string;
   numberOfGames: number;
   firstServer: 0 | 1;
+  player1Color: string;
+  player2Color: string;
 };
 
 export type PlayerStats = {

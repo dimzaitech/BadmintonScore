@@ -45,7 +45,7 @@ export function useMatchState(config: MatchConfig) {
 
   const redo = useCallback(() => {
     if (canRedo) {
-      setHistoryIndex(prev => prev + 1);
+      setHistoryIndex(prev => prev - 1);
     }
   }, [canRedo]);
   

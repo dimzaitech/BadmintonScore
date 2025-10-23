@@ -4,8 +4,6 @@ import { useState, useMemo, useCallback } from 'react';
 import type { MatchConfig, GameState, PlayerStats, MatchData } from '@/lib/types';
 
 const MAX_GAMES = 3;
-const WINNING_SCORE = 21;
-const DEUCE_WINNING_SCORE = 30;
 const MATCH_HISTORY_KEY = 'smashscore_history';
 
 const createInitialState = (config: MatchConfig): GameState => ({
@@ -45,7 +43,7 @@ export function useMatchState(config: MatchConfig) {
 
   const redo = useCallback(() => {
     if (canRedo) {
-      setHistoryIndex(prev => prev - 1);
+      setHistoryIndex(prev => prev + 1);
     }
   }, [canRedo]);
   
@@ -62,7 +60,7 @@ export function useMatchState(config: MatchConfig) {
 
     // Check for game/match win
     const [p1Score, p2Score] = newState.scores[newState.currentGameIndex];
-    const gameWinner = checkGameWinner(p1Score, p2Score);
+    const gameWinner = checkGameWinner(p1Score, p2Score, newState.config.winningScore);
 
     if (gameWinner !== null) {
       newState.gamesWon[gameWinner]++;
@@ -114,11 +112,9 @@ export function useMatchState(config: MatchConfig) {
 }
 
 
-function checkGameWinner(p1Score: number, p2Score: number): 0 | 1 | null {
-  if (p1Score >= WINNING_SCORE && p1Score >= p2Score + 2) return 0;
-  if (p2Score >= WINNING_SCORE && p2Score >= p1Score + 2) return 1;
-  if (p1Score === DEUCE_WINNING_SCORE) return 0;
-  if (p2Score === DEUCE_WINNING_SCORE) return 1;
+function checkGameWinner(p1Score: number, p2Score: number, winningScore: number): 0 | 1 | null {
+  if (p1Score >= winningScore) return 0;
+  if (p2Score >= winningScore) return 1;
   return null;
 }
 

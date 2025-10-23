@@ -42,6 +42,7 @@ const formSchema = z.object({
   matchType: z.enum(["tunggal", "ganda"]).default("tunggal"),
   firstServer: z.enum(["0", "1"]),
   tournamentMode: z.boolean().default(false),
+  winningScore: z.enum(["10", "15", "21"]).default("21"),
 });
 
 type MatchSetupFormValues = z.infer<typeof formSchema>;
@@ -61,6 +62,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
       matchType: "tunggal",
       firstServer: "0",
       tournamentMode: false,
+      winningScore: "21",
     },
   });
 
@@ -74,6 +76,7 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
       firstServer: parseInt(values.firstServer, 10) as 0 | 1,
       player1Color: values.player1Color,
       player2Color: values.player2Color,
+      winningScore: parseInt(values.winningScore, 10) as 10 | 15 | 21,
     });
   }
 
@@ -172,30 +175,55 @@ export function MatchSetup({ onMatchStart }: MatchSetupProps) {
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="firstServer"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Siapa yang Servis Pertama?</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Pilih siapa yang servis pertama" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="0">{form.watch("player1Name")}</SelectItem>
-                      <SelectItem value="1">{form.watch("player2Name")}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-2 gap-4">
+               <FormField
+                control={form.control}
+                name="firstServer"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Servis Pertama</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih server" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="0">{form.watch("player1Name")}</SelectItem>
+                        <SelectItem value="1">{form.watch("player2Name")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="winningScore"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Skor Akhir</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Pilih skor" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="10">10 Poin</SelectItem>
+                        <SelectItem value="15">15 Poin</SelectItem>
+                        <SelectItem value="21">21 Poin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+           
             <FormField
               control={form.control}
               name="tournamentMode"

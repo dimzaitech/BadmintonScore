@@ -79,7 +79,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
     });
   }
 
-  const winnerName = state.winner !== null ? state.config[`player${state.winner + 1}Name` as keyof MatchConfig] : null;
+  const winnerName = state.winner !== null ? state.config[`player${state.winner + 1}Name` as 'player1Name' | 'player2Name'] : null;
   
   const statsInput: MatchStatisticsInput | null = state.winner !== null ? {
       player1Name: state.config.player1Name,
@@ -112,7 +112,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             server={state.winner === null ? state.server : null}
             onPlayer1Point={() => handleAwardPoint(0)}
             onPlayer2Point={(): void => handleAwardPoint(1)}
-            previousScores={state.scores}
             currentGameIndex={state.currentGameIndex}
             player1Color={state.config.player1Color}
             player2Color={state.config.player2Color}

@@ -5,6 +5,7 @@ export type MatchConfig = {
   firstServer: 0 | 1;
   player1Color: string;
   player2Color: string;
+  winningScore: 10 | 15 | 21;
 };
 
 export type PlayerStats = {

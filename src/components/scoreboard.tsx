@@ -58,7 +58,7 @@ export function Scoreboard({
     name: sidesSwapped ? player2Name : player1Name,
     score: sidesSwapped ? player2Score : player1Score,
     gamesWon: sidesSwapped ? player2GamesWon : player1GamesWon,
-    server: sidesSwapped ? 1 : 0,
+    serverIndex: sidesSwapped ? 1 : 0,
     onPoint: sidesSwapped ? onPlayer2Point : onPlayer1Point,
     color: sidesSwapped ? player2Color : player1Color,
     isPlayer1: !sidesSwapped,
@@ -68,13 +68,17 @@ export function Scoreboard({
     name: sidesSwapped ? player1Name : player2Name,
     score: sidesSwapped ? player1Score : player2Score,
     gamesWon: sidesSwapped ? player1GamesWon : player2GamesWon,
-    server: sidesSwapped ? 0 : 1,
+    serverIndex: sidesSwapped ? 0 : 1,
     onPoint: sidesSwapped ? onPlayer1Point : onPlayer2Point,
     color: sidesSwapped ? player1Color : player2Color,
     isPlayer1: sidesSwapped,
   };
 
   const finishedGamesScores = scores.slice(0, currentGameIndex);
+
+  const getShuttlecockPositionClass = (score: number) => {
+    return score % 2 === 0 ? "right-4" : "left-4";
+  };
 
   return (
     <div className="relative w-full h-[60vh] max-h-[800px] border-4 border-primary rounded-lg overflow-hidden">
@@ -108,8 +112,11 @@ export function Scoreboard({
           <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
             {playerLeft.score}
           </div>
-          {server === playerLeft.server && (
-             <ShuttlecockIcon className="absolute bottom-4 h-10 w-10 animate-pulse" />
+          {server === playerLeft.serverIndex && (
+             <ShuttlecockIcon className={cn(
+                "absolute bottom-4 h-10 w-10 animate-pulse",
+                getShuttlecockPositionClass(playerLeft.score)
+              )} />
           )}
         </div>
 
@@ -142,8 +149,11 @@ export function Scoreboard({
           <div className="flex-grow flex items-center justify-center text-[25vh] leading-none">
             {playerRight.score}
           </div>
-          {server === playerRight.server && (
-            <ShuttlecockIcon className="absolute bottom-4 h-10 w-10 animate-pulse" />
+          {server === playerRight.serverIndex && (
+            <ShuttlecockIcon className={cn(
+              "absolute bottom-4 h-10 w-10 animate-pulse",
+              getShuttlecockPositionClass(playerRight.score)
+            )} />
           )}
         </div>
       </div>

@@ -17,7 +17,7 @@ export default function Home() {
   };
 
   return (
-    <div className="container mx-auto flex max-w-4xl flex-col items-center p-4 md:p-8">
+    <div className="container mx-auto flex max-w-7xl flex-col items-center p-2 md:p-4">
       {!matchConfig ? (
         <MatchSetup onMatchStart={handleMatchStart} />
       ) : (

@@ -1,5 +1,5 @@
+import { Server } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { User, Server } from "lucide-react";
 
 interface ScoreboardProps {
   player1Name: string;
@@ -11,27 +11,56 @@ interface ScoreboardProps {
   server: 0 | 1 | null;
   onPlayer1Point: () => void;
   onPlayer2Point: () => void;
-  player1Color: string;
-  player2Color: string;
+  previousScores: [number, number][];
   currentGameIndex: number;
 }
 
-// Helper to determine text color based on background luminance
-function getContrastingTextColor(hexcolor: string): string {
-  if (!hexcolor) return '#000000';
-  hexcolor = hexcolor.replace("#", "");
-  const r = parseInt(hexcolor.substr(0, 2), 16);
-  const g = parseInt(hexcolor.substr(2, 2), 16);
-  const b = parseInt(hexcolor.substr(4, 2), 16);
-  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
-  return (yiq >= 128) ? '#020617' : '#fafafa'; // slate-950 or slate-50
-}
+// Custom SVG for shuttlecock icon
+const ShuttlecockIcon = ({ className }: { className?: string }) => (
+  <svg
+    className={className}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M18.5 7.5C18.5 9.43 16.93 11 15 11C13.07 11 11.5 9.43 11.5 7.5C11.5 5.57 13.07 4 15 4C16.93 4 18.5 5.57 18.5 7.5Z M13 11.5L9.5 15L10.5 16L14 12.5L13 11.5Z M7 17.5L5.5 19L9 22.5L10.5 21L7 17.5Z M17 12.5L20.5 16L19.5 17L16 13.5L17 12.5Z" />
+  </svg>
+);
 
 
-export function Scoreboard({ player1Name, player2Name, player1Score, player2Score, player1GamesWon, player2GamesWon, server, onPlayer1Point, onPlayer2Point, player1Color, player2Color, currentGameIndex }: ScoreboardProps) {
-  
-  const player1TextColor = getContrastingTextColor(player1Color);
-  const player2TextColor = getContrastingTextColor(player2Color);
+const CourtCell = ({
+  children,
+  className,
+  onClick,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+}) => (
+  <div
+    className={cn(
+      "border-primary flex items-center justify-center border-2",
+      className
+    )}
+    onClick={onClick}
+  >
+    {children}
+  </div>
+);
+
+export function Scoreboard({
+  player1Name,
+  player2Name,
+  player1Score,
+  player2Score,
+  player1GamesWon,
+  player2GamesWon,
+  server,
+  onPlayer1Point,
+  onPlayer2Point,
+  previousScores,
+  currentGameIndex,
+}: ScoreboardProps) {
 
   const swapSides = currentGameIndex % 2 === 1;
 
@@ -39,65 +68,88 @@ export function Scoreboard({ player1Name, player2Name, player1Score, player2Scor
     name: swapSides ? player2Name : player1Name,
     score: swapSides ? player2Score : player1Score,
     gamesWon: swapSides ? player2GamesWon : player1GamesWon,
-    color: swapSides ? player2Color : player1Color,
-    textColor: swapSides ? player2TextColor : player1TextColor,
     server: swapSides ? 1 : 0,
     onPoint: swapSides ? onPlayer2Point : onPlayer1Point,
+    previousGameScores: previousScores.map(score => score[swapSides ? 1 : 0])
   };
 
   const playerRight = {
     name: swapSides ? player1Name : player2Name,
     score: swapSides ? player1Score : player2Score,
     gamesWon: swapSides ? player1GamesWon : player2GamesWon,
-    color: swapSides ? player1Color : player2Color,
-    textColor: swapSides ? player1TextColor : player2TextColor,
     server: swapSides ? 0 : 1,
     onPoint: swapSides ? onPlayer1Point : onPlayer2Point,
+    previousGameScores: previousScores.map(score => score[swapSides ? 0 : 1])
   };
 
-  return (
-    <div className="grid grid-cols-2 gap-2 rounded-lg overflow-hidden shadow-lg">
-      {/* Player Left */}
-      <div 
-        className="text-center p-4 transition-colors duration-300"
-        style={{ backgroundColor: playerLeft.color, color: playerLeft.textColor }}
-      >
-        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: playerLeft.textColor }}>
-          <User className="h-5 w-5" />
-          <span className="truncate">{playerLeft.name}</span>
-          {server === playerLeft.server && <Server className="h-5 w-5 text-accent animate-pulse" />}
-        </div>
-        <div
-          key={`p-left-${playerLeft.score}`}
-          className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
-          onClick={playerLeft.onPoint}
-          style={{ color: playerLeft.textColor }}
-        >
-          {playerLeft.score}
-        </div>
-        <div className="text-sm" style={{ color: playerLeft.textColor, opacity: 0.8 }}>Game: {playerLeft.gamesWon}</div>
-      </div>
+  const getPreviousScore = (player: 'left' | 'right', gameIndex: number) => {
+    if (gameIndex >= currentGameIndex) return null;
+    const score = player === 'left' ? playerLeft.previousGameScores[gameIndex] : playerRight.previousGameScores[gameIndex];
+    const opponentScore = player === 'left' ? playerRight.previousGameScores[gameIndex] : playerLeft.previousGameScores[gameIndex];
 
-      {/* Player Right */}
-      <div 
-        className="text-center p-4 transition-colors duration-300"
-        style={{ backgroundColor: playerRight.color, color: playerRight.textColor }}
+    const didWin = score > opponentScore && (score >= 21 || score === 30);
+    
+    return (
+        <span className={cn(didWin && "text-accent font-bold")}>{score}</span>
+    )
+  }
+
+  return (
+    <div
+      className="grid h-[60vh] max-h-[800px] w-full grid-cols-[1fr_6fr_6fr_1fr] grid-rows-[auto_1fr_1fr] gap-0.5 bg-background font-bold"
+      style={{
+        gridTemplateAreas: `
+          'name-left name-left name-right name-right'
+          'prev1-left score-left score-right prev1-right'
+          'prev2-left score-left score-right prev2-right'
+        `,
+      }}
+    >
+      {/* Names */}
+      <CourtCell className="border-b-0" style={{ gridArea: "name-left" }}>{playerLeft.name}</CourtCell>
+      <CourtCell className="border-b-0" style={{ gridArea: "name-right" }}>{playerRight.name}</CourtCell>
+      
+      {/* Previous Scores */}
+      <CourtCell style={{ gridArea: "prev1-left" }}>{getPreviousScore('left', 0)}</CourtCell>
+      <CourtCell style={{ gridArea: "prev2-left" }}>{getPreviousScore('left', 1)}</CourtCell>
+      <CourtCell style={{ gridArea: "prev1-right" }}>{getPreviousScore('right', 0)}</CourtCell>
+      <CourtCell style={{ gridArea: "prev2-right" }}>{getPreviousScore('right', 1)}</CourtCell>
+
+      {/* Main Scores */}
+      <CourtCell
+        className="relative cursor-pointer text-[18vh] leading-none"
+        style={{ gridArea: "score-left" }}
+        onClick={playerLeft.onPoint}
       >
-        <div className="flex items-center justify-center gap-2 text-lg font-semibold" style={{ color: playerRight.textColor }}>
-          <User className="h-5 w-5" />
-          <span className="truncate">{playerRight.name}</span>
-          {server === playerRight.server && <Server className="h-5 w-5 text-accent animate-pulse" />}
-        </div>
-        <div
-          key={`p-right-${playerRight.score}`}
-          className="text-7xl md:text-8xl font-bold animate-in fade-in-0 scale-90 duration-500 cursor-pointer"
-          onClick={playerRight.onPoint}
-          style={{ color: playerRight.textColor }}
-        >
-          {playerRight.score}
-        </div>
-        <div className="text-sm" style={{ color: playerRight.textColor, opacity: 0.8 }}>Game: {playerRight.gamesWon}</div>
+        {playerLeft.score}
+        {server === playerLeft.server && (
+            <ShuttlecockIcon className="absolute right-4 top-4 h-8 w-8 text-foreground animate-pulse" />
+        )}
+      </CourtCell>
+      <CourtCell
+        className="relative cursor-pointer text-[18vh] leading-none"
+        style={{ gridArea: "score-right" }}
+        onClick={playerRight.onPoint}
+      >
+        {playerRight.score}
+        {server === playerRight.server && (
+            <ShuttlecockIcon className="absolute right-4 top-4 h-8 w-8 text-foreground animate-pulse" />
+        )}
+      </CourtCell>
+
+      {/* Center Console */}
+      <div className="absolute left-1/2 top-1/2 z-10 grid h-full w-1/4 -translate-x-1/2 -translate-y-1/2 grid-cols-2 grid-rows-[2fr_3fr_2fr_2fr] text-lg">
+          <CourtCell className="col-span-2 text-4xl">{playerLeft.gamesWon}</CourtCell>
+          <CourtCell className="col-span-2 !border-0"></CourtCell>
+          <CourtCell className="col-span-2 !border-0"></CourtCell>
+          <CourtCell className="col-span-2 !border-0"></CourtCell>
+          <CourtCell className="col-span-2 text-4xl">{playerRight.gamesWon}</CourtCell>
       </div>
+       <div className="absolute left-1/2 top-1/2 z-0 grid h-full w-1/4 -translate-x-1/2 -translate-y-1/2 grid-cols-2 grid-rows-[1fr_1fr] text-lg">
+           <CourtCell className="col-span-1">{playerLeft.gamesWon}</CourtCell>
+           <CourtCell className="col-span-1">{playerRight.gamesWon}</CourtCell>
+           <CourtCell className="col-span-2"></CourtCell>
+       </div>
     </div>
   );
 }

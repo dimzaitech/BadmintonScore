@@ -93,20 +93,16 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
     } : null;
 
   return (
-    <div className="w-full space-y-6 animate-in fade-in-0 zoom-in-95">
-      <Card>
-        <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle className="text-xl md:text-2xl">Pertandingan Saat Ini</CardTitle>
-              <div className="flex items-center space-x-2">
-                <TimerDisplay />
-                <Button onClick={undo} disabled={!canUndo} variant="outline" size="icon" aria-label="Batal"><Undo className="h-4 w-4" /></Button>
-                <Button onClick={redo} disabled={!canRedo} variant="outline" size="icon" aria-label="Ulangi"><Redo className="h-4 w-4" /></Button>
-              </div>
+    <div className="w-full space-y-4 animate-in fade-in-0">
+        <div className="flex justify-between items-center px-2">
+            <div className="flex items-center space-x-2">
+                <Button onClick={undo} disabled={!canUndo} variant="ghost" size="icon" aria-label="Batal"><Undo className="h-5 w-5" /></Button>
+                <Button onClick={redo} disabled={!canRedo} variant="ghost" size="icon" aria-label="Ulangi"><Redo className="h-5 w-5" /></Button>
             </div>
-        </CardHeader>
-        <CardContent>
-          <Scoreboard 
+            <TimerDisplay />
+        </div>
+        
+        <Scoreboard 
             player1Name={state.config.player1Name}
             player2Name={state.config.player2Name}
             player1Score={state.scores[state.currentGameIndex][0]}
@@ -116,12 +112,9 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             server={state.winner === null ? state.server : null}
             onPlayer1Point={() => handleAwardPoint(0)}
             onPlayer2Point={() => handleAwardPoint(1)}
-            player1Color={state.config.player1Color}
-            player2Color={state.config.player2Color}
+            previousScores={state.scores}
             currentGameIndex={state.currentGameIndex}
-          />
-        </CardContent>
-      </Card>
+        />
 
       {state.winner !== null && (
         <Card className="text-center animate-in fade-in-50 zoom-in-95">

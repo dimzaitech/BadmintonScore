@@ -6,10 +6,8 @@ import type { MatchConfig } from '@/lib/types';
 import { Scoreboard } from '@/components/scoreboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Undo, Redo, AlertCircle, Sparkles, RefreshCw, Timer } from 'lucide-react';
+import { Undo, Redo, Sparkles, RefreshCw, Timer } from 'lucide-react';
 import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
   AlertDialog,
@@ -64,17 +62,12 @@ function TimerDisplay() {
 
 
 export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfaceProps) {
-  const { state, awardPoint, addFault, undo, redo, canUndo, canRedo, saveMatch } = useMatchState(matchConfig);
+  const { state, awardPoint, undo, redo, canUndo, canRedo, saveMatch } = useMatchState(matchConfig);
   const { toast } = useToast();
-  const [isP1ServiceWinner, setIsP1ServiceWinner] = useState(false);
-  const [isP2ServiceWinner, setIsP2ServiceWinner] = useState(false);
   const [showSummary, setShowSummary] = useState(false);
   
   const handleAwardPoint = (player: 0 | 1) => {
-    const isServiceWinner = player === 0 ? isP1ServiceWinner : isP2ServiceWinner;
-    awardPoint(player, isServiceWinner);
-    setIsP1ServiceWinner(false);
-    setIsP2ServiceWinner(false);
+    awardPoint(player, false);
   };
   
   const handleSaveMatch = (summary?: string) => {
@@ -124,12 +117,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             onPlayer2Point={() => handleAwardPoint(1)}
           />
         </CardContent>
-        {state.winner === null ? (
-          <CardFooter className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <PlayerControls name={state.config.player1Name} onFault={() => addFault(0)} isServiceWinner={isP1ServiceWinner} onServiceWinnerChange={setIsP1ServiceWinner} />
-              <PlayerControls name={state.config.player2Name} onFault={() => addFault(1)} isServiceWinner={isP2ServiceWinner} onServiceWinnerChange={setIsP2ServiceWinner} />
-          </CardFooter>
-        ) : null}
       </Card>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-center">
@@ -174,20 +161,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       {showSummary && statsInput && <MatchSummaryCard statsInput={statsInput} />}
     </div>
   );
-}
-
-function PlayerControls({ name, onFault, isServiceWinner, onServiceWinnerChange }: { name: string, onFault: () => void, isServiceWinner: boolean, onServiceWinnerChange: (checked: boolean) => void }) {
-  return (
-    <div className="space-y-3 rounded-lg border p-4">
-      <h3 className="font-semibold text-center truncate">{name}</h3>
-      <div className="flex items-center space-x-2">
-        <Checkbox id={`sw-${name}`} checked={isServiceWinner} onCheckedChange={(checked) => onServiceWinnerChange(checked as boolean)} />
-        <Label htmlFor={`sw-${name}`} className="text-sm">Pemenang Servis</Label>
-      </div>
-      <Separator />
-      <Button onClick={onFault} variant="destructive" className="w-full"><AlertCircle className="mr-2 h-4 w-4" />Catat Kesalahan</Button>
-    </div>
-  )
 }
 
 function StatDisplay({ label, p1Stat, p2Stat }: { label: string, p1Stat: number, p2Stat: number }) {

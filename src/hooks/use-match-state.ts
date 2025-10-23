@@ -85,26 +85,6 @@ export function useMatchState(config: MatchConfig) {
     updateState(newState);
   }, [currentState, updateState]);
   
-  const addFault = useCallback((playerIndex: 0 | 1) => {
-    if (currentState.winner !== null) return;
-    const opponentIndex = playerIndex === 0 ? 1 : 0;
-    
-    // A fault awards a point to the opponent
-    // We need to update the stats before awarding the point to avoid a race condition with state update
-     const newState = JSON.parse(JSON.stringify(currentState)) as GameState;
-     newState.stats[playerIndex].faults++;
-     
-     setHistory(prevHistory => {
-        const newHistory = prevHistory.slice(0, historyIndex + 1);
-        newHistory.push(newState);
-        return newHistory;
-     });
-     setHistoryIndex(prevIndex => prevIndex + 1);
-    
-    awardPoint(opponentIndex, false);
-
-  }, [currentState, awardPoint, history, historyIndex]);
-
   const saveMatch = useCallback((summary?: string) => {
     if(currentState.winner === null) return; // Only save completed matches
 
@@ -130,7 +110,6 @@ export function useMatchState(config: MatchConfig) {
   return {
     state: currentState,
     awardPoint,
-    addFault,
     undo,
     redo,
     canUndo,

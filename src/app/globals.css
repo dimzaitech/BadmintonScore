@@ -106,11 +106,11 @@ body {
 }
 
 .fullscreen-scoreboard-active #scoreboard-container .score-display {
-  font-size: 45vh; /* Make font size much larger in fullscreen */
+  font-size: 40vh; /* Make font size much larger in fullscreen */
 }
 
 @media (orientation: landscape) {
   .fullscreen-scoreboard-active #scoreboard-container .score-display {
-     font-size: 40vw; /* Adjust for landscape */
+     font-size: 35vw; /* Adjust for landscape */
   }
 }

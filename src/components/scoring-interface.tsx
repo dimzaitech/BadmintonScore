@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { MatchStatisticsInput } from '@/ai/flows/match-statistics-generation';
-import { useFullscreen } from '@/hooks/use-fullscreen';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { useFullscreenContext } from '@/context/fullscreen-context';
 
 
@@ -67,37 +67,57 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(false);
   const [isWinnerAlertOpen, setIsWinnerAlertOpen] = useState(false);
-  const { isLandscape } = useFullscreen();
+  const isMobile = useIsMobile();
   const { setIsFullscreen } = useFullscreenContext();
   
   useEffect(() => {
-    const scoreboardEl = document.getElementById('scoreboard-container');
-    const body = document.body;
+    const enterFullscreen = async () => {
+        if (isMobile) {
+            const body = document.body;
+            setIsFullscreen(true);
+            body.classList.add('fullscreen-scoreboard-active');
+            
+            try {
+                if (document.documentElement.requestFullscreen) {
+                    await document.documentElement.requestFullscreen();
+                }
+                // Try to lock orientation to landscape
+                if (screen.orientation && screen.orientation.lock) {
+                    await screen.orientation.lock('landscape');
+                }
+            } catch (err) {
+                console.error(`Gagal masuk mode fullscreen atau mengunci orientasi: ${err}`);
+            }
+        }
+    };
 
-    if (isLandscape && scoreboardEl) {
-      setIsFullscreen(true);
-      body.classList.add('fullscreen-scoreboard-active');
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(err => {
-          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
-        });
-      }
-    } else {
-      setIsFullscreen(false);
-      body.classList.remove('fullscreen-scoreboard-active');
-      if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen();
-      }
-    }
-    
-    return () => {
-      body.classList.remove('fullscreen-scoreboard-active');
-      setIsFullscreen(false);
-      if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen();
+    enterFullscreen();
+
+    const handleFullscreenChange = () => {
+      if (!document.fullscreenElement) {
+        setIsFullscreen(false);
+        document.body.classList.remove('fullscreen-scoreboard-active');
+        if (screen.orientation && screen.orientation.unlock) {
+          screen.orientation.unlock();
+        }
       }
     };
-  }, [isLandscape, setIsFullscreen]);
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    
+    return () => {
+        document.removeEventListener('fullscreenchange', handleFullscreenChange);
+        // Clean up styles and state when component unmounts
+        document.body.classList.remove('fullscreen-scoreboard-active');
+        setIsFullscreen(false);
+        if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen();
+        }
+        if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock();
+        }
+    };
+  }, [isMobile, setIsFullscreen]);
   
   const handleSaveMatch = useCallback(() => {
     if (state.winner !== null) {
@@ -125,8 +145,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   
   const handleGenerateSummary = () => {
     setShowSummary(true);
-    // The match is already saved, here we might update it with a summary if needed,
-    // or the MatchSummaryCard can handle its own logic to save the summary.
   }
 
   const winnerName = state.winner !== null ? state.config[`player${state.winner + 1}Name` as 'player1Name' | 'player2Name'] : null;
@@ -167,7 +185,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
               <AlertDialogTitle className="text-3xl text-primary">Pertandingan Selesai!</AlertDialogTitle>
               <div className="text-sm text-muted-foreground text-center">
                 <div className="text-xl font-semibold text-foreground">{winnerName} memenangkan pertandingan!</div>
-                <div className="text-lg text-muted-foreground">{state.gamesWon.join(' - ')}</div>
+                <div className="text-lg">{state.gamesWon.join(' - ')}</div>
               </div>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">

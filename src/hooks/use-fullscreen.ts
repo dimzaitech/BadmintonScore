@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -7,19 +8,19 @@ export function useFullscreen() {
 
   useEffect(() => {
     const checkOrientation = () => {
-      // Check for landscape orientation
       if (typeof window !== "undefined") {
         const isLandscapeMode = window.matchMedia("(orientation: landscape)").matches;
         setIsLandscape(isLandscapeMode);
       }
     };
 
-    checkOrientation(); // Initial check
+    checkOrientation();
 
-    window.addEventListener('resize', checkOrientation);
+    const handleResize = () => checkOrientation();
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', checkOrientation);
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 

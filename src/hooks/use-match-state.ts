@@ -141,9 +141,7 @@ function checkGameWinner(p1Score: number, p2Score: number, winningScore: number)
 
 function checkMatchWinner(gamesWon: [number, number], maxGames: number): 0 | 1 | null {
     const gamesToWin = Math.ceil(maxGames / 2);
-    if(gamesWon[0] === gamesToWin) return 0;
-    if(gamesWon[1] === gamesToWin) return 1;
+    if (gamesWon[0] >= gamesToWin) return 0;
+    if (gamesWon[1] >= gamesToWin) return 1;
     return null;
 }
-
-    

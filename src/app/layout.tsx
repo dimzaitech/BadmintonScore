@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import { Header } from '@/components/header';
 import { Toaster } from '@/components/ui/toaster';
+import { AppLayout } from '@/components/app-layout';
 
 export const metadata: Metadata = {
   title: 'SmashScore',
@@ -27,10 +27,7 @@ export default function RootLayout({
         )}
         suppressHydrationWarning={true}
       >
-        <div className="relative mx-auto flex min-h-screen max-w-md flex-col border-x border-neutral-700 bg-background shadow-2xl">
-          <Header />
-          <main className="flex-1">{children}</main>
-        </div>
+        <AppLayout>{children}</AppLayout>
         <Toaster />
       </body>
     </html>

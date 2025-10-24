@@ -59,7 +59,7 @@ body {
     --accent-foreground: 0 0% 10%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 90 40% 40%;
+    border: 90 40% 40%;
     --input: 90 40% 20%;
     --ring: 90 60% 55%;
     --chart-1: 220 70% 50%;
@@ -84,5 +84,33 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Fullscreen styles */
+.fullscreen-scoreboard-active #scoreboard-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  background-color: hsl(var(--background));
+}
+
+.fullscreen-scoreboard-active #scoreboard-container .scoreboard {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  border-width: 0;
+}
+
+.fullscreen-scoreboard-active #scoreboard-container .score-display {
+  font-size: 45vh; /* Make font size much larger in fullscreen */
+}
+
+@media (orientation: landscape) {
+  .fullscreen-scoreboard-active #scoreboard-container .score-display {
+     font-size: 40vw; /* Adjust for landscape */
   }
 }

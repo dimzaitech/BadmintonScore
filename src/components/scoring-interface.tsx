@@ -21,6 +21,9 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { MatchStatisticsInput } from '@/ai/flows/match-statistics-generation';
+import { useFullscreen } from '@/hooks/use-fullscreen';
+import { useFullscreenContext } from '@/context/fullscreen-context';
+
 
 interface ScoringInterfaceProps {
   matchConfig: MatchConfig;
@@ -64,7 +67,39 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   const { state, awardPoint, undo, redo, canUndo, canRedo, saveMatch, swapSides } = useMatchState(matchConfig);
   const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(false);
+  const { isLandscape } = useFullscreen();
+  const { setIsFullscreen } = useFullscreenContext();
   
+  useEffect(() => {
+    const scoreboardEl = document.getElementById('scoreboard-container');
+    const body = document.body;
+
+    if (isLandscape && scoreboardEl) {
+      setIsFullscreen(true);
+      body.classList.add('fullscreen-scoreboard-active');
+      if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+          console.error(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+        });
+      }
+    } else {
+      setIsFullscreen(false);
+      body.classList.remove('fullscreen-scoreboard-active');
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    
+    // Cleanup function
+    return () => {
+      body.classList.remove('fullscreen-scoreboard-active');
+      setIsFullscreen(false);
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    };
+  }, [isLandscape, setIsFullscreen]);
+
   const handleAwardPoint = (player: 0 | 1) => {
     if (state.winner === null) {
       awardPoint(player);

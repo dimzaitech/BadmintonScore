@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useMatchState } from '@/hooks/use-match-state';
 import type { MatchConfig } from '@/lib/types';
 import { Scoreboard } from '@/components/scoreboard';
@@ -11,13 +11,11 @@ import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
   AlertDialog,
   AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
 import { MatchStatisticsInput } from '@/ai/flows/match-statistics-generation';
@@ -99,14 +97,22 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       }
     };
   }, [isLandscape, setIsFullscreen]);
+  
+  const handleSaveMatch = useCallback((summary?: string) => {
+    saveMatch(summary);
+    toast({
+      title: "Pertandingan Disimpan!",
+      description: "Pertandingan telah disimpan ke riwayat Anda.",
+    });
+  }, [saveMatch, toast]);
 
   useEffect(() => {
-    if (state.winner !== null) {
+    if (state.winner !== null && !isWinnerAlertOpen) {
       setIsWinnerAlertOpen(true);
-      // Automatically save match when there's a winner
+      // Automatically save match when there's a winner, without a summary initially
       handleSaveMatch();
     }
-  }, [state.winner]);
+  }, [state.winner, isWinnerAlertOpen, handleSaveMatch]);
 
 
   const handleAwardPoint = (player: 0 | 1) => {
@@ -115,12 +121,10 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
     }
   };
   
-  const handleSaveMatch = (summary?: string) => {
-    saveMatch(summary);
-    toast({
-      title: "Pertandingan Disimpan!",
-      description: "Pertandingan telah disimpan ke riwayat Anda.",
-    });
+  const handleGenerateSummary = () => {
+    setShowSummary(true);
+    // The match is already saved, here we might update it with a summary if needed,
+    // or the MatchSummaryCard can handle its own logic to save the summary.
   }
 
   const winnerName = state.winner !== null ? state.config[`player${state.winner + 1}Name` as 'player1Name' | 'player2Name'] : null;
@@ -166,7 +170,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">
               {!showSummary && statsInput && (
-                <AlertDialogAction className="w-full" onClick={() => { setShowSummary(true); handleSaveMatch(); }}>
+                <AlertDialogAction className="w-full" onClick={handleGenerateSummary}>
                   <Sparkles className="mr-2 h-4 w-4"/>Buat Ringkasan Pertandingan
                 </AlertDialogAction>
               )}

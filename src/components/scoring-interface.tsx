@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useEffect, useCallback } from 'react';
@@ -98,8 +99,8 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
     };
   }, [isLandscape, setIsFullscreen]);
   
-  const handleSaveMatch = useCallback((summary?: string) => {
-    saveMatch(summary);
+  const handleSaveMatch = useCallback(() => {
+    saveMatch();
     toast({
       title: "Pertandingan Disimpan!",
       description: "Pertandingan telah disimpan ke riwayat Anda.",
@@ -107,12 +108,11 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   }, [saveMatch, toast]);
 
   useEffect(() => {
-    if (state.winner !== null && !isWinnerAlertOpen) {
+    if (state.winner !== null) {
       setIsWinnerAlertOpen(true);
-      // Automatically save match when there's a winner, without a summary initially
       handleSaveMatch();
     }
-  }, [state.winner, isWinnerAlertOpen, handleSaveMatch]);
+  }, [state.winner, handleSaveMatch]);
 
 
   const handleAwardPoint = (player: 0 | 1) => {
@@ -164,8 +164,8 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
               <Trophy className="h-16 w-16 text-amber-500" />
               <AlertDialogTitle className="text-3xl text-primary">Pertandingan Selesai!</AlertDialogTitle>
               <AlertDialogDescription className="text-center">
-                <p className="text-xl font-semibold text-foreground">{winnerName} memenangkan pertandingan!</p>
-                <p className="text-lg text-muted-foreground">{state.gamesWon.join(' - ')}</p>
+                <div className="text-xl font-semibold text-foreground">{winnerName} memenangkan pertandingan!</div>
+                <div className="text-lg text-muted-foreground">{state.gamesWon.join(' - ')}</div>
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">

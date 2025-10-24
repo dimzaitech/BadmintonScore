@@ -1,4 +1,3 @@
-
 "use client";
 
 import { ShuttlecockIcon } from "@/components/shuttlecock-icon";

@@ -100,12 +100,14 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   }, [isLandscape, setIsFullscreen]);
   
   const handleSaveMatch = useCallback(() => {
-    saveMatch();
-    toast({
-      title: "Pertandingan Disimpan!",
-      description: "Pertandingan telah disimpan ke riwayat Anda.",
-    });
-  }, [saveMatch, toast]);
+    if (state.winner !== null) {
+      saveMatch();
+      toast({
+        title: "Pertandingan Disimpan!",
+        description: "Pertandingan telah disimpan ke riwayat Anda.",
+      });
+    }
+  }, [state.winner, saveMatch, toast]);
 
   useEffect(() => {
     if (state.winner !== null) {
@@ -163,10 +165,10 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
             <AlertDialogHeader className="items-center">
               <Trophy className="h-16 w-16 text-amber-500" />
               <AlertDialogTitle className="text-3xl text-primary">Pertandingan Selesai!</AlertDialogTitle>
-              <AlertDialogDescription className="text-center">
+              <div className="text-sm text-muted-foreground text-center">
                 <div className="text-xl font-semibold text-foreground">{winnerName} memenangkan pertandingan!</div>
                 <div className="text-lg text-muted-foreground">{state.gamesWon.join(' - ')}</div>
-              </AlertDialogDescription>
+              </div>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">
               {!showSummary && statsInput && (

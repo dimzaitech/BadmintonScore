@@ -6,7 +6,7 @@ import type { MatchConfig } from '@/lib/types';
 import { Scoreboard } from '@/components/scoreboard';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Undo, Redo, Sparkles, RefreshCw, Timer } from 'lucide-react';
+import { Undo, Redo, Sparkles, RefreshCw, Timer, Trophy } from 'lucide-react';
 import { MatchSummaryCard } from '@/components/match-summary-card';
 import {
   AlertDialog,
@@ -67,6 +67,7 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
   const { state, awardPoint, undo, redo, canUndo, canRedo, saveMatch, swapSides } = useMatchState(matchConfig);
   const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(false);
+  const [isWinnerAlertOpen, setIsWinnerAlertOpen] = useState(false);
   const { isLandscape } = useFullscreen();
   const { setIsFullscreen } = useFullscreenContext();
   
@@ -90,7 +91,6 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       }
     }
     
-    // Cleanup function
     return () => {
       body.classList.remove('fullscreen-scoreboard-active');
       setIsFullscreen(false);
@@ -99,6 +99,15 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
       }
     };
   }, [isLandscape, setIsFullscreen]);
+
+  useEffect(() => {
+    if (state.winner !== null) {
+      setIsWinnerAlertOpen(true);
+      // Automatically save match when there's a winner
+      handleSaveMatch();
+    }
+  }, [state.winner]);
+
 
   const handleAwardPoint = (player: 0 | 1) => {
     if (state.winner === null) {
@@ -145,40 +154,43 @@ export function ScoringInterface({ matchConfig, onNewMatch }: ScoringInterfacePr
         />
 
       {state.winner !== null && (
-        <Card className="text-center animate-in fade-in-50 zoom-in-95">
-          <CardHeader>
-            <CardTitle className="text-3xl text-primary">Pertandingan Selesai!</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">{winnerName} memenangkan pertandingan!</p>
-            <p className="text-muted-foreground">{state.gamesWon.join(' - ')}</p>
-          </CardContent>
-          <CardFooter className="flex flex-col md:flex-row justify-center gap-4">
-            {!showSummary && statsInput && (
-              <Button onClick={() => { setShowSummary(true); handleSaveMatch(); }}><Sparkles className="mr-2 h-4 w-4"/>Buat Ringkasan Pertandingan</Button>
-            )}
-             <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="outline"><RefreshCw className="mr-2 h-4 w-4"/>Pertandingan Baru</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                    <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Ini akan mengakhiri pertandingan saat ini dan memulai yang baru. Pertandingan Anda telah disimpan.
-                    </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction onClick={onNewMatch}>Mulai Pertandingan Baru</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
-          </CardFooter>
+        <AlertDialog open={isWinnerAlertOpen} onOpenChange={setIsWinnerAlertOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader className="items-center">
+              <Trophy className="h-16 w-16 text-amber-500" />
+              <AlertDialogTitle className="text-3xl text-primary">Pertandingan Selesai!</AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                <p className="text-xl font-semibold text-foreground">{winnerName} memenangkan pertandingan!</p>
+                <p className="text-lg text-muted-foreground">{state.gamesWon.join(' - ')}</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-col sm:flex-col sm:space-x-0 gap-2">
+              {!showSummary && statsInput && (
+                <AlertDialogAction className="w-full" onClick={() => { setShowSummary(true); handleSaveMatch(); }}>
+                  <Sparkles className="mr-2 h-4 w-4"/>Buat Ringkasan Pertandingan
+                </AlertDialogAction>
+              )}
+              <AlertDialogAction className="w-full" onClick={onNewMatch}>
+                <RefreshCw className="mr-2 h-4 w-4"/>Mulai Pertandingan Baru
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {showSummary && statsInput && (
+        <Card className="animate-in fade-in-50 zoom-in-95">
+            <CardHeader>
+                <CardTitle>Ringkasan Pertandingan</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <MatchSummaryCard statsInput={statsInput} />
+            </CardContent>
+            <CardFooter>
+                 <Button variant="outline" onClick={onNewMatch} className="w-full"><RefreshCw className="mr-2 h-4 w-4"/>Pertandingan Baru</Button>
+            </CardFooter>
         </Card>
       )}
-      
-      {showSummary && statsInput && <MatchSummaryCard statsInput={statsInput} />}
     </div>
   );
 }
